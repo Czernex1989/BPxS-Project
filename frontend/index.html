@@ -35,14 +35,19 @@
 
     button {
       cursor: pointer;
-      background-color: #2563eb;
       color: white;
       border: none;
       border-radius: 5px;
+      background-color: #2563eb;
     }
 
     button:hover {
-      background-color: #1d4ed8;
+      opacity: 0.9;
+    }
+
+    .cancel-button {
+      display: none;
+      background-color: #64748b;
     }
 
     .client {
@@ -90,15 +95,24 @@
       color: #166534;
     }
 
-    .delete-button {
-      width: auto;
-      padding: 7px 12px;
-      margin: 5px 0 0 0;
-      background-color: #dc2626;
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
     }
 
-    .delete-button:hover {
-      background-color: #b91c1c;
+    .actions button {
+      width: auto;
+      padding: 7px 12px;
+      margin: 0;
+    }
+
+    .edit-button {
+      background-color: #d97706;
+    }
+
+    .delete-button {
+      background-color: #dc2626;
     }
 
     #message {
@@ -112,7 +126,7 @@
   <div class="container">
     <h1>BPxS Mini CRM</h1>
 
-    <h2>Dodaj klienta</h2>
+    <h2 id="formTitle">Dodaj klienta</h2>
 
     <form id="clientForm">
       <label for="name">Nazwa firmy:</label>
@@ -141,7 +155,17 @@
         <option value="WYSOKI">Wysoki</option>
       </select>
 
-      <button type="submit">Dodaj klienta</button>
+      <button id="submitButton" type="submit">
+        Dodaj klienta
+      </button>
+
+      <button
+        id="cancelButton"
+        class="cancel-button"
+        type="button"
+      >
+        Anuluj edycję
+      </button>
     </form>
 
     <div id="message"></div>
@@ -153,8 +177,19 @@
   <script>
     const API_URL = "http://localhost:3000";
 
+    let editingClientId = null;
+
     const clientForm =
       document.getElementById("clientForm");
+
+    const formTitle =
+      document.getElementById("formTitle");
+
+    const submitButton =
+      document.getElementById("submitButton");
+
+    const cancelButton =
+      document.getElementById("cancelButton");
 
     const message =
       document.getElementById("message");
@@ -172,6 +207,45 @@
       }
 
       return "priority-medium";
+    }
+
+    function resetForm() {
+      editingClientId = null;
+      clientForm.reset();
+
+      formTitle.textContent = "Dodaj klienta";
+      submitButton.textContent = "Dodaj klienta";
+      cancelButton.style.display = "none";
+    }
+
+    function startEditing(client) {
+      editingClientId = client.id;
+
+      document.getElementById("name").value =
+        client.name;
+
+      document.getElementById("email").value =
+        client.email;
+
+      document.getElementById("note").value =
+        client.note || "";
+
+      document.getElementById("status").value =
+        client.status || "NOWY";
+
+      document.getElementById("priority").value =
+        client.priority || "ŚREDNI";
+
+      formTitle.textContent =
+        `Edytuj klienta: ${client.name}`;
+
+      submitButton.textContent = "Zapisz zmiany";
+      cancelButton.style.display = "block";
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
 
     async function deleteClient(clientId, clientName) {
@@ -195,6 +269,10 @@
 
         if (!response.ok) {
           throw new Error(result.error);
+        }
+
+        if (editingClientId === clientId) {
+          resetForm();
         }
 
         message.textContent =
@@ -285,6 +363,22 @@
           noteElement.textContent =
             `Notatka: ${client.note || "Brak"}`;
 
+          const actionsElement =
+            document.createElement("div");
+
+          actionsElement.className = "actions";
+
+          const editButton =
+            document.createElement("button");
+
+          editButton.type = "button";
+          editButton.className = "edit-button";
+          editButton.textContent = "Edytuj";
+
+          editButton.addEventListener("click", () => {
+            startEditing(client);
+          });
+
           const deleteButton =
             document.createElement("button");
 
@@ -296,10 +390,13 @@
             deleteClient(client.id, client.name);
           });
 
+          actionsElement.appendChild(editButton);
+          actionsElement.appendChild(deleteButton);
+
           clientElement.appendChild(headerElement);
           clientElement.appendChild(emailElement);
           clientElement.appendChild(noteElement);
-          clientElement.appendChild(deleteButton);
+          clientElement.appendChild(actionsElement);
 
           clientsList.appendChild(clientElement);
         });
@@ -310,6 +407,13 @@
         console.error(error);
       }
     }
+
+    cancelButton.addEventListener("click", () => {
+      resetForm();
+
+      message.textContent = "Edycja została anulowana.";
+      message.style.color = "#475569";
+    });
 
     clientForm.addEventListener(
       "submit",
@@ -325,17 +429,24 @@
             document.getElementById("priority").value,
         };
 
+        const isEditing = editingClientId !== null;
+
+        const requestUrl = isEditing
+          ? `${API_URL}/api/clients/${editingClientId}`
+          : `${API_URL}/api/clients`;
+
+        const requestMethod = isEditing
+          ? "PUT"
+          : "POST";
+
         try {
-          const response = await fetch(
-            `${API_URL}/api/clients`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(clientData),
-            }
-          );
+          const response = await fetch(requestUrl, {
+            method: requestMethod,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(clientData),
+          });
 
           const result = await response.json();
 
@@ -343,18 +454,19 @@
             throw new Error(result.error);
           }
 
-          message.textContent =
-            "Klient został zapisany w bazie!";
+          message.textContent = isEditing
+            ? "Zmiany klienta zostały zapisane!"
+            : "Klient został zapisany w bazie!";
 
           message.style.color = "green";
 
-          clientForm.reset();
+          resetForm();
 
           await loadClients();
         } catch (error) {
           message.textContent =
             error.message ||
-            "Nie udało się dodać klienta.";
+            "Nie udało się zapisać klienta.";
 
           message.style.color = "red";
 

@@ -99,6 +99,60 @@ app.post("/api/clients", async (req, res) => {
   }
 });
 
+app.put("/api/clients/:id", async (req, res) => {
+  try {
+    const clientId = req.params.id;
+
+    const {
+      name,
+      email,
+      note,
+      status,
+      priority,
+    } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({
+        error: "Nazwa firmy i e-mail są wymagane",
+      });
+    }
+
+    const result = await pool.query(
+      `UPDATE clients
+       SET
+         name = $1,
+         email = $2,
+         note = $3,
+         status = $4,
+         priority = $5
+       WHERE id = $6
+       RETURNING *`,
+      [
+        name,
+        email,
+        note || "",
+        status || "NOWY",
+        priority || "ŚREDNI",
+        clientId,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Nie znaleziono klienta",
+      });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Nie udało się edytować klienta",
+    });
+  }
+});
+
 app.delete("/api/clients/:id", async (req, res) => {
   try {
     const clientId = req.params.id;
