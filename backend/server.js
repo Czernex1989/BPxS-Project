@@ -31,6 +31,7 @@ app.get("/db-test", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       error: "Błąd połączenia z bazą",
     });
@@ -46,6 +47,7 @@ app.get("/clients", async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       error: "Nie udało się pobrać klientów",
     });
@@ -54,16 +56,13 @@ app.get("/clients", async (req, res) => {
 
 app.post("/api/clients", async (req, res) => {
   try {
-    const name =
-      req.body.name ||
-      req.body.company ||
-      req.body.companyName;
-
-    const email = req.body.email;
-    const note =
-      req.body.note ||
-      req.body.description ||
-      "";
+    const {
+      name,
+      email,
+      note,
+      status,
+      priority,
+    } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({
@@ -72,15 +71,28 @@ app.post("/api/clients", async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO clients (name, email, note)
-       VALUES ($1, $2, $3)
-       RETURNING *`,
-      [name, email, note]
+      `INSERT INTO clients (
+        name,
+        email,
+        note,
+        status,
+        priority
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *`,
+      [
+        name,
+        email,
+        note || "",
+        status || "NOWY",
+        priority || "ŚREDNI",
+      ]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       error: "Nie udało się zapisać klienta",
     });
