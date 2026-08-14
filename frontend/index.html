@@ -1,54 +1,183 @@
 <!DOCTYPE html>
 <html lang="pl">
-
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>BPxS Mini CRM</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f4f6f8;
+    }
+
+    .container {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    input,
+    textarea,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .client {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #eef2ff;
+      border-radius: 6px;
+    }
+
+    #message {
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="container">
+    <h1>BPxS Mini CRM</h1>
 
-  <h1>BPxS Mini CRM</h1>
+    <h2>Dodaj klienta</h2>
 
-  <h2>Dodaj klienta</h2>
+    <form id="clientForm">
+      <label for="name">Nazwa firmy:</label>
 
-  <form id="clientForm">
+      <input
+        id="name"
+        type="text"
+        required
+      >
 
-    <label>Nazwa firmy:</label>
-    <input type="text" id="name">
+      <label for="email">Email:</label>
 
-    <br><br>
+      <input
+        id="email"
+        type="email"
+        required
+      >
 
-    <label>Email:</label>
-    <input type="email" id="email">
+      <label for="note">Notatka:</label>
 
-    <br><br>
+      <textarea id="note"></textarea>
 
-    <label>Notatka:</label>
-    <textarea id="note"></textarea>
+      <button type="submit">Dodaj klienta</button>
+    </form>
 
-    <br><br>
+    <div id="message"></div>
 
-    <button type="submit">Dodaj klienta</button>
+    <h2>Lista klientów</h2>
 
-  </form>
+    <div id="clientsList"></div>
+  </div>
+
   <script>
-  const form = document.getElementById("clientForm");
+    const API_URL = "http://localhost:3000";
 
-  form.addEventListener("submit", function(event) {
-    event.preventDefault();
+    const clientForm = document.getElementById("clientForm");
+    const message = document.getElementById("message");
+    const clientsList = document.getElementById("clientsList");
 
-    const clientData = {
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      note: document.getElementById("note").value
-    };
+    async function loadClients() {
+      try {
+        const response = await fetch(`${API_URL}/clients`);
+        const clients = await response.json();
 
-    alert(JSON.stringify(clientData, null, 2));
-  });
-  
-</script>
+        clientsList.innerHTML = "";
 
+        if (clients.length === 0) {
+          clientsList.textContent = "Brak klientów w bazie.";
+          return;
+        }
+
+        clients.forEach((client) => {
+          const clientElement = document.createElement("div");
+          clientElement.className = "client";
+
+          const nameElement = document.createElement("strong");
+          nameElement.textContent = client.name;
+
+          const emailElement = document.createElement("p");
+          emailElement.textContent = `Email: ${client.email}`;
+
+          const noteElement = document.createElement("p");
+          noteElement.textContent = `Notatka: ${client.note || "Brak"}`;
+
+          clientElement.appendChild(nameElement);
+          clientElement.appendChild(emailElement);
+          clientElement.appendChild(noteElement);
+
+          clientsList.appendChild(clientElement);
+        });
+      } catch (error) {
+        clientsList.textContent = "Nie udało się pobrać klientów.";
+        console.error(error);
+      }
+    }
+
+    clientForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const clientData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        note: document.getElementById("note").value,
+      };
+
+      try {
+        const response = await fetch(`${API_URL}/api/clients`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(clientData),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error);
+        }
+
+        message.textContent = "Klient został zapisany w bazie!";
+        message.style.color = "green";
+
+        clientForm.reset();
+
+        await loadClients();
+      } catch (error) {
+        message.textContent = error.message || "Nie udało się dodać klienta.";
+        message.style.color = "red";
+
+        console.error(error);
+      }
+    });
+
+    loadClients();
+  </script>
 </body>
-
 </html>
