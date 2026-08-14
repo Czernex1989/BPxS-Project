@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8">
+  <title>BPxS Mini CRM</title>
+</head>
+
+<body>
+
+  <h1>BPxS Mini CRM</h1>
+
+  <h2>Dodaj klienta</h2>
+
+  <form id="clientForm">
+
+    <label>Nazwa firmy:</label>
+    <input type="text" id="name">
+
+    <br><br>
+
+    <label>Email:</label>
+    <input type="email" id="email">
+
+    <br><br>
+
+    <label>Notatka:</label>
+    <textarea id="note"></textarea>
+
+    <br><br>
+
+    <button type="submit">Dodaj klienta</button>
+
+  </form>
+  <script>
+  const form = document.getElementById("clientForm");
+
+  form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const clientData = {
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      note: document.getElementById("note").value
+    };
+
+    alert(JSON.stringify(clientData, null, 2));
+  });
+  
+</script>
+
+</body>
+
+</html>
