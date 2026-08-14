@@ -99,6 +99,36 @@ app.post("/api/clients", async (req, res) => {
   }
 });
 
+app.delete("/api/clients/:id", async (req, res) => {
+  try {
+    const clientId = req.params.id;
+
+    const result = await pool.query(
+      `DELETE FROM clients
+       WHERE id = $1
+       RETURNING *`,
+      [clientId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Nie znaleziono klienta",
+      });
+    }
+
+    res.json({
+      message: "Klient został usunięty",
+      client: result.rows[0],
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Nie udało się usunąć klienta",
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend działa na http://localhost:${PORT}`);
 });

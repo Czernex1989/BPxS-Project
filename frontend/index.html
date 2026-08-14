@@ -90,6 +90,17 @@
       color: #166534;
     }
 
+    .delete-button {
+      width: auto;
+      padding: 7px 12px;
+      margin: 5px 0 0 0;
+      background-color: #dc2626;
+    }
+
+    .delete-button:hover {
+      background-color: #b91c1c;
+    }
+
     #message {
       font-weight: bold;
       margin-top: 15px;
@@ -117,7 +128,9 @@
       <select id="status">
         <option value="NOWY">Nowy</option>
         <option value="KONTAKT">Kontakt</option>
-        <option value="ZAINTERESOWANY">Zainteresowany</option>
+        <option value="ZAINTERESOWANY">
+          Zainteresowany
+        </option>
         <option value="ZAMKNIĘTY">Zamknięty</option>
       </select>
 
@@ -140,9 +153,14 @@
   <script>
     const API_URL = "http://localhost:3000";
 
-    const clientForm = document.getElementById("clientForm");
-    const message = document.getElementById("message");
-    const clientsList = document.getElementById("clientsList");
+    const clientForm =
+      document.getElementById("clientForm");
+
+    const message =
+      document.getElementById("message");
+
+    const clientsList =
+      document.getElementById("clientsList");
 
     function getPriorityClass(priority) {
       if (priority === "WYSOKI") {
@@ -156,38 +174,96 @@
       return "priority-medium";
     }
 
+    async function deleteClient(clientId, clientName) {
+      const confirmed = confirm(
+        `Czy na pewno usunąć klienta ${clientName}?`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_URL}/api/clients/${clientId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error);
+        }
+
+        message.textContent =
+          `Klient ${clientName} został usunięty.`;
+
+        message.style.color = "green";
+
+        await loadClients();
+      } catch (error) {
+        message.textContent =
+          error.message || "Nie udało się usunąć klienta.";
+
+        message.style.color = "red";
+
+        console.error(error);
+      }
+    }
+
     async function loadClients() {
       try {
-        const response = await fetch(`${API_URL}/clients`);
+        const response = await fetch(
+          `${API_URL}/clients`
+        );
+
         const clients = await response.json();
 
         clientsList.innerHTML = "";
 
         if (clients.length === 0) {
-          clientsList.textContent = "Brak klientów w bazie.";
+          clientsList.textContent =
+            "Brak klientów w bazie.";
+
           return;
         }
 
         clients.forEach((client) => {
-          const clientElement = document.createElement("div");
+          const clientElement =
+            document.createElement("div");
+
           clientElement.className = "client";
 
-          const headerElement = document.createElement("div");
+          const headerElement =
+            document.createElement("div");
+
           headerElement.className = "client-header";
 
-          const nameElement = document.createElement("strong");
+          const nameElement =
+            document.createElement("strong");
+
           nameElement.textContent = client.name;
 
-          const badgesElement = document.createElement("div");
+          const badgesElement =
+            document.createElement("div");
+
           badgesElement.className = "badges";
 
-          const statusElement = document.createElement("span");
-          statusElement.className = "badge";
-          statusElement.textContent = client.status || "NOWY";
+          const statusElement =
+            document.createElement("span");
 
-          const priorityElement = document.createElement("span");
+          statusElement.className = "badge";
+          statusElement.textContent =
+            client.status || "NOWY";
+
+          const priorityElement =
+            document.createElement("span");
+
           priorityElement.className =
             `badge ${getPriorityClass(client.priority)}`;
+
           priorityElement.textContent =
             `Priorytet: ${client.priority || "ŚREDNI"}`;
 
@@ -197,16 +273,33 @@
           headerElement.appendChild(nameElement);
           headerElement.appendChild(badgesElement);
 
-          const emailElement = document.createElement("p");
-          emailElement.textContent = `Email: ${client.email}`;
+          const emailElement =
+            document.createElement("p");
 
-          const noteElement = document.createElement("p");
+          emailElement.textContent =
+            `Email: ${client.email}`;
+
+          const noteElement =
+            document.createElement("p");
+
           noteElement.textContent =
             `Notatka: ${client.note || "Brak"}`;
+
+          const deleteButton =
+            document.createElement("button");
+
+          deleteButton.type = "button";
+          deleteButton.className = "delete-button";
+          deleteButton.textContent = "Usuń";
+
+          deleteButton.addEventListener("click", () => {
+            deleteClient(client.id, client.name);
+          });
 
           clientElement.appendChild(headerElement);
           clientElement.appendChild(emailElement);
           clientElement.appendChild(noteElement);
+          clientElement.appendChild(deleteButton);
 
           clientsList.appendChild(clientElement);
         });
@@ -218,49 +311,57 @@
       }
     }
 
-    clientForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    clientForm.addEventListener(
+      "submit",
+      async (event) => {
+        event.preventDefault();
 
-      const clientData = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        note: document.getElementById("note").value,
-        status: document.getElementById("status").value,
-        priority: document.getElementById("priority").value,
-      };
+        const clientData = {
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          note: document.getElementById("note").value,
+          status: document.getElementById("status").value,
+          priority:
+            document.getElementById("priority").value,
+        };
 
-      try {
-        const response = await fetch(`${API_URL}/api/clients`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(clientData),
-        });
+        try {
+          const response = await fetch(
+            `${API_URL}/api/clients`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(clientData),
+            }
+          );
 
-        const result = await response.json();
+          const result = await response.json();
 
-        if (!response.ok) {
-          throw new Error(result.error);
+          if (!response.ok) {
+            throw new Error(result.error);
+          }
+
+          message.textContent =
+            "Klient został zapisany w bazie!";
+
+          message.style.color = "green";
+
+          clientForm.reset();
+
+          await loadClients();
+        } catch (error) {
+          message.textContent =
+            error.message ||
+            "Nie udało się dodać klienta.";
+
+          message.style.color = "red";
+
+          console.error(error);
         }
-
-        message.textContent =
-          "Klient został zapisany w bazie!";
-
-        message.style.color = "green";
-
-        clientForm.reset();
-
-        await loadClients();
-      } catch (error) {
-        message.textContent =
-          error.message || "Nie udało się dodać klienta.";
-
-        message.style.color = "red";
-
-        console.error(error);
       }
-    });
+    );
 
     loadClients();
   </script>
