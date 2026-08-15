@@ -7,221 +7,951 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>BPxS Mini CRM</title>
+  <title>BPxS AI CRM</title>
 
   <style>
+    :root {
+      --background: #07111f;
+      --background-soft: #0d192b;
+      --panel: rgba(16, 29, 49, 0.92);
+      --panel-light: rgba(24, 39, 65, 0.92);
+      --border: rgba(148, 163, 184, 0.16);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --purple: #8b5cf6;
+      --purple-light: #a78bfa;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 760px;
-      margin: 40px auto;
-      padding: 20px;
-      background-color: #f4f6f8;
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(59, 130, 246, 0.16),
+          transparent 32%
+        ),
+        radial-gradient(
+          circle at 90% 25%,
+          rgba(139, 92, 246, 0.13),
+          transparent 30%
+        ),
+        var(--background);
     }
 
-    .container {
-      background-color: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
+    button,
     input,
     textarea,
-    select,
-    button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 15px;
+    select {
+      font: inherit;
     }
 
     button {
       cursor: pointer;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      background-color: #2563eb;
     }
 
-    button:hover {
-      opacity: 0.9;
+    .page {
+      width: min(1500px, calc(100% - 40px));
+      margin: 0 auto;
+      padding-bottom: 60px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin-bottom: 28px;
+      padding: 18px 0;
+      background: rgba(7, 17, 31, 0.78);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-content {
+      width: min(1500px, calc(100% - 40px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      font-size: 21px;
+      font-weight: 800;
+      color: white;
+      background:
+        linear-gradient(
+          135deg,
+          var(--blue),
+          var(--purple)
+        );
+      box-shadow: 0 10px 28px rgba(99, 102, 241, 0.32);
+    }
+
+    .brand-name {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .brand-description {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px;
+      border: 1px solid rgba(34, 197, 94, 0.22);
+      border-radius: 999px;
+      font-size: 13px;
+      color: #bbf7d0;
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    .hero {
+      margin-bottom: 26px;
+    }
+
+    .hero-eyebrow {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 800px;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+    }
+
+    .hero h1 span {
+      color: transparent;
+      background:
+        linear-gradient(
+          90deg,
+          var(--blue-light),
+          var(--purple-light)
+        );
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero-text {
+      max-width: 720px;
+      margin: 15px 0 0;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      padding: 19px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+    }
+
+    .stat-label {
+      margin: 0 0 9px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      margin: 0;
+      font-size: 29px;
+      font-weight: 800;
+    }
+
+    .stat-accent-blue {
+      border-top: 2px solid var(--blue);
+    }
+
+    .stat-accent-red {
+      border-top: 2px solid var(--red);
+    }
+
+    .stat-accent-green {
+      border-top: 2px solid var(--green);
+    }
+
+    .stat-accent-purple {
+      border-top: 2px solid var(--purple);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .form-panel {
+      position: sticky;
+      top: 105px;
+    }
+
+    .panel-header {
+      padding: 22px 22px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .panel-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 11px;
+      font-weight: 800;
+      color: white;
+      background:
+        linear-gradient(
+          135deg,
+          var(--blue),
+          var(--purple)
+        );
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .panel-subtitle {
+      margin: 5px 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .form-content {
+      padding: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 17px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 650;
+      color: #cbd5e1;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 11px;
+      outline: none;
+      background: rgba(7, 17, 31, 0.7);
+      transition:
+        border-color 0.2s,
+        box-shadow 0.2s,
+        transform 0.2s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+    }
+
+    textarea {
+      min-height: 105px;
+      resize: vertical;
+    }
+
+    select option {
+      color: #0f172a;
+      background: white;
+    }
+
+    .primary-button,
+    .secondary-button {
+      width: 100%;
+      padding: 13px 16px;
+      border: none;
+      border-radius: 11px;
+      font-weight: 750;
+      color: white;
+      transition:
+        transform 0.2s,
+        opacity 0.2s,
+        box-shadow 0.2s;
+    }
+
+    .primary-button {
+      background:
+        linear-gradient(
+          135deg,
+          var(--blue),
+          var(--purple)
+        );
+      box-shadow: 0 12px 25px rgba(79, 70, 229, 0.25);
+    }
+
+    .secondary-button {
+      display: none;
+      margin-top: 10px;
+      color: #cbd5e1;
+      border: 1px solid var(--border);
+      background: rgba(100, 116, 139, 0.16);
+    }
+
+    .primary-button:hover:not(:disabled),
+    .secondary-button:hover:not(:disabled),
+    .action-button:hover:not(:disabled) {
+      transform: translateY(-1px);
     }
 
     button:disabled {
       cursor: not-allowed;
-      opacity: 0.6;
+      opacity: 0.55;
     }
 
-    .cancel-button {
+    #message {
       display: none;
-      background-color: #64748b;
+      margin: 0 22px 22px;
+      padding: 12px 14px;
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.45;
     }
 
-    .client {
-      margin-top: 15px;
-      padding: 15px;
-      background-color: #eef2ff;
-      border-radius: 6px;
-      border-left: 5px solid #2563eb;
+    #message.success {
+      display: block;
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.24);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    #message.error {
+      display: block;
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.24);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    #message.info {
+      display: block;
+      color: #cbd5e1;
+      border: 1px solid var(--border);
+      background: rgba(100, 116, 139, 0.12);
+    }
+
+    .clients-panel {
+      min-width: 0;
+    }
+
+    .clients-panel .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .clients-counter {
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #bfdbfe;
+      background: rgba(59, 130, 246, 0.12);
+    }
+
+    #clientsList {
+      display: grid;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .client-card {
+      position: relative;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(24, 39, 65, 0.88),
+          rgba(13, 25, 43, 0.9)
+        );
+      transition:
+        transform 0.2s,
+        border-color 0.2s,
+        box-shadow 0.2s;
+      overflow: hidden;
+    }
+
+    .client-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background:
+        linear-gradient(
+          180deg,
+          var(--blue),
+          var(--purple)
+        );
+    }
+
+    .client-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(96, 165, 250, 0.32);
+      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.2);
     }
 
     .client-header {
       display: flex;
+      align-items: flex-start;
       justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .client-name {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .client-email {
+      display: inline-block;
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .client-email:hover {
+      color: var(--blue-light);
     }
 
     .badges {
       display: flex;
-      gap: 8px;
+      justify-content: flex-end;
+      gap: 7px;
       flex-wrap: wrap;
     }
 
     .badge {
-      padding: 5px 9px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: bold;
-      background-color: #dbeafe;
-      color: #1e40af;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .status-badge {
+      color: #bfdbfe;
+      background: rgba(59, 130, 246, 0.14);
     }
 
     .priority-high {
-      background-color: #fee2e2;
-      color: #991b1b;
+      color: #fecaca;
+      background: rgba(239, 68, 68, 0.14);
     }
 
     .priority-medium {
-      background-color: #fef3c7;
-      color: #92400e;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.14);
     }
 
     .priority-low {
-      background-color: #dcfce7;
-      color: #166534;
+      color: #bbf7d0;
+      background: rgba(34, 197, 94, 0.14);
     }
 
-    .ai-insights {
-      margin-top: 12px;
-      padding: 12px;
-      background-color: #ffffff;
-      border: 1px solid #c7d2fe;
-      border-radius: 6px;
+    .note-box {
+      margin-bottom: 14px;
+      padding: 13px 14px;
+      border-radius: 11px;
+      color: #cbd5e1;
+      background: rgba(7, 17, 31, 0.42);
+      line-height: 1.5;
     }
 
-    .ai-insights p {
-      margin: 6px 0;
-      line-height: 1.4;
+    .section-label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
     }
 
-    .ai-label {
-      color: #1e40af;
+    .ai-box {
+      margin-bottom: 14px;
+      padding: 15px;
+      border: 1px solid rgba(139, 92, 246, 0.24);
+      border-radius: 13px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.08),
+          rgba(139, 92, 246, 0.1)
+        );
+    }
+
+    .ai-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #c4b5fd;
+    }
+
+    .ai-content {
+      margin: 0;
+      color: #e2e8f0;
+      line-height: 1.55;
+    }
+
+    .next-action {
+      margin-top: 11px;
+      padding-top: 11px;
+      border-top: 1px solid rgba(148, 163, 184, 0.12);
     }
 
     .agent-task {
-      margin-top: 12px;
-      padding: 12px;
-      background-color: #f5f3ff;
-      border-left: 4px solid #7c3aed;
-      border-radius: 6px;
-      line-height: 1.4;
+      margin-bottom: 15px;
+      padding: 14px;
+      border-left: 3px solid var(--purple);
+      border-radius: 10px;
+      color: #ddd6fe;
+      background: rgba(139, 92, 246, 0.09);
+      line-height: 1.5;
     }
 
-    .agent-task-label {
-      color: #6d28d9;
+    .task-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+
+    .task-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--purple-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .task-status {
+      padding: 4px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.13);
+    }
+
+    .task-text {
+      margin: 0;
     }
 
     .actions {
       display: flex;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 9px;
+      flex-wrap: wrap;
     }
 
-    .actions button {
-      width: auto;
-      padding: 7px 12px;
-      margin: 0;
+    .action-button {
+      padding: 9px 12px;
+      border: none;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 750;
+      color: white;
+      transition:
+        transform 0.2s,
+        opacity 0.2s;
     }
 
     .agent-button {
-      background-color: #7c3aed;
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #9333ea
+        );
     }
 
     .edit-button {
-      background-color: #d97706;
+      background: #c76c08;
     }
 
     .delete-button {
-      background-color: #dc2626;
+      background: #dc2626;
     }
 
-    #message {
-      font-weight: bold;
-      margin-top: 15px;
+    .empty-state,
+    .loading-state {
+      padding: 44px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      border-radius: 15px;
+      font-size: 21px;
+      color: var(--blue-light);
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    @media (max-width: 1050px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-panel {
+        position: static;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .page,
+      .topbar-content {
+        width: min(100% - 24px, 1500px);
+      }
+
+      .topbar {
+        padding: 12px 0;
+      }
+
+      .system-status {
+        display: none;
+      }
+
+      .hero {
+        margin-top: 22px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .stat-card {
+        padding: 15px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .client-header {
+        flex-direction: column;
+      }
+
+      .badges {
+        justify-content: flex-start;
+      }
+
+      .clients-panel .panel-header {
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>BPxS Mini CRM</h1>
+  <header class="topbar">
+    <div class="topbar-content">
+      <div class="brand">
+        <div class="brand-logo">B</div>
 
-    <h2 id="formTitle">Dodaj klienta</h2>
+        <div>
+          <h2 class="brand-name">BPxS CRM</h2>
+          <p class="brand-description">
+            Inteligentna obsługa klientów
+          </p>
+        </div>
+      </div>
 
-    <form id="clientForm">
-      <label for="name">Nazwa firmy:</label>
-      <input id="name" type="text" required>
+      <div class="system-status">
+        <span class="status-dot"></span>
+        System aktywny
+      </div>
+    </div>
+  </header>
 
-      <label for="email">Email:</label>
-      <input id="email" type="email" required>
+  <main class="page">
+    <section class="hero">
+      <p class="hero-eyebrow">AI-powered workspace</p>
 
-      <label for="note">Notatka:</label>
-      <textarea id="note"></textarea>
+      <h1>
+        Zarządzaj klientami z pomocą
+        <span>agenta AI</span>
+      </h1>
 
-      <label for="status">Status:</label>
-      <select id="status">
-        <option value="NOWY">Nowy</option>
-        <option value="KONTAKT">Kontakt</option>
-        <option value="ZAINTERESOWANY">
-          Zainteresowany
-        </option>
-        <option value="ZAMKNIĘTY">
-          Zamknięty
-        </option>
-      </select>
+      <p class="hero-text">
+        Klienci, analiza AI, rekomendowane działania i zadania
+        agenta w jednym miejscu.
+      </p>
+    </section>
 
-      <label for="priority">Priorytet:</label>
-      <select id="priority">
-        <option value="NISKI">Niski</option>
-        <option value="ŚREDNI" selected>
-          Średni
-        </option>
-        <option value="WYSOKI">Wysoki</option>
-      </select>
+    <section class="stats-grid">
+      <article class="stat-card stat-accent-blue">
+        <p class="stat-label">Wszyscy klienci</p>
+        <p id="totalClients" class="stat-value">0</p>
+      </article>
 
-      <button id="submitButton" type="submit">
-        Dodaj klienta
-      </button>
+      <article class="stat-card stat-accent-red">
+        <p class="stat-label">Wysoki priorytet</p>
+        <p id="highPriorityClients" class="stat-value">0</p>
+      </article>
 
-      <button
-        id="cancelButton"
-        class="cancel-button"
-        type="button"
-      >
-        Anuluj edycję
-      </button>
-    </form>
+      <article class="stat-card stat-accent-green">
+        <p class="stat-label">Status kontakt</p>
+        <p id="contactClients" class="stat-value">0</p>
+      </article>
 
-    <div id="message"></div>
+      <article class="stat-card stat-accent-purple">
+        <p class="stat-label">Zadania agentów</p>
+        <p id="agentTasksCount" class="stat-value">0</p>
+      </article>
+    </section>
 
-    <h2>Lista klientów</h2>
-    <div id="clientsList"></div>
-  </div>
+    <section class="dashboard-grid">
+      <aside class="panel form-panel">
+        <div class="panel-header">
+          <div class="panel-title-row">
+            <div class="panel-icon">+</div>
+
+            <div>
+              <h2 id="formTitle" class="panel-title">
+                Dodaj klienta
+              </h2>
+
+              <p class="panel-subtitle">
+                AI przeanalizuje zapisane informacje
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form id="clientForm" class="form-content">
+          <div class="form-group">
+            <label for="name">Nazwa firmy</label>
+            <input
+              id="name"
+              type="text"
+              placeholder="np. Nova Dental"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="email">Adres e-mail</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="kontakt@firma.pl"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="note">Notatka o kliencie</label>
+            <textarea
+              id="note"
+              placeholder="Opisz potrzeby klienta..."
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="status">Status</label>
+
+              <select id="status">
+                <option value="NOWY">Nowy</option>
+                <option value="KONTAKT">Kontakt</option>
+
+                <option value="ZAINTERESOWANY">
+                  Zainteresowany
+                </option>
+
+                <option value="ZAMKNIĘTY">
+                  Zamknięty
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="priority">Priorytet</label>
+
+              <select id="priority">
+                <option value="NISKI">Niski</option>
+
+                <option value="ŚREDNI" selected>
+                  Średni
+                </option>
+
+                <option value="WYSOKI">Wysoki</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            id="submitButton"
+            class="primary-button"
+            type="submit"
+          >
+            Dodaj klienta
+          </button>
+
+          <button
+            id="cancelButton"
+            class="secondary-button"
+            type="button"
+          >
+            Anuluj edycję
+          </button>
+        </form>
+
+        <div id="message"></div>
+      </aside>
+
+      <section class="panel clients-panel">
+        <div class="panel-header">
+          <div class="panel-title-row">
+            <div class="panel-icon">◎</div>
+
+            <div>
+              <h2 class="panel-title">Lista klientów</h2>
+
+              <p class="panel-subtitle">
+                Dane pobierane z PostgreSQL
+              </p>
+            </div>
+          </div>
+
+          <span id="clientsCounter" class="clients-counter">
+            0 klientów
+          </span>
+        </div>
+
+        <div id="clientsList">
+          <div class="loading-state">
+            Pobieranie klientów...
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
 
   <script>
-    const API_URL = "http://localhost:3000";
+    const API_URL = window.location.origin;
 
     let editingClientId = null;
 
@@ -243,20 +973,23 @@
     const clientsList =
       document.getElementById("clientsList");
 
+    const clientsCounter =
+      document.getElementById("clientsCounter");
+
     function clearMessage() {
       message.textContent = "";
-      message.style.color = "";
+      message.className = "";
     }
 
-    function showMessage(text, color) {
+    function showMessage(text, type = "info") {
       message.textContent = text;
-      message.style.color = color;
+      message.className = type;
     }
 
     function getFriendlyError(error) {
       if (
         error.message === "Failed to fetch" ||
-        error.message.includes("fetch")
+        error.message.toLowerCase().includes("fetch")
       ) {
         return "Nie udało się połączyć z backendem.";
       }
@@ -286,6 +1019,7 @@
       formTitle.textContent = "Dodaj klienta";
       submitButton.textContent = "Dodaj klienta";
       submitButton.disabled = false;
+
       cancelButton.style.display = "none";
     }
 
@@ -310,7 +1044,7 @@
         client.priority || "ŚREDNI";
 
       formTitle.textContent =
-        `Edytuj klienta: ${client.name}`;
+        `Edytuj: ${client.name}`;
 
       submitButton.textContent = "Zapisz zmiany";
       cancelButton.style.display = "block";
@@ -321,10 +1055,7 @@
       });
     }
 
-    async function deleteClient(
-      clientId,
-      clientName
-    ) {
+    async function deleteClient(clientId, clientName) {
       clearMessage();
 
       const confirmed = confirm(
@@ -346,7 +1077,9 @@
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.error);
+          throw new Error(
+            result.error || "Nie udało się usunąć klienta."
+          );
         }
 
         if (editingClientId === clientId) {
@@ -355,14 +1088,14 @@
 
         showMessage(
           `Klient ${clientName} został usunięty.`,
-          "green"
+          "success"
         );
 
         await loadClients();
       } catch (error) {
         showMessage(
           getFriendlyError(error),
-          "red"
+          "error"
         );
 
         console.error(error);
@@ -372,52 +1105,339 @@
     async function runAgent(
       clientId,
       clientName,
-      agentButton
+      button
     ) {
       clearMessage();
 
-      agentButton.disabled = true;
-      agentButton.textContent = "Agent pracuje...";
+      const originalText = button.textContent;
+
+      button.disabled = true;
+      button.textContent = "Agent pracuje...";
 
       try {
         const response = await fetch(
           `${API_URL}/api/clients/${clientId}/agent-run`,
           {
             method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
         );
 
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.error);
+          throw new Error(
+            result.error ||
+            "Nie udało się uruchomić agenta."
+          );
         }
 
-        const newestTask = result.tasks[0];
+        const latestTask =
+          result.tasks &&
+          result.tasks.length > 0
+            ? result.tasks[0].action
+            : "Agent zakończył analizę klienta.";
 
         showMessage(
-          newestTask
-            ? `Agent zakończył pracę. Zadanie: ${newestTask.action}`
-            : `Agent zakończył pracę dla ${clientName}.`,
-          "green"
+          `Agent zakończył pracę dla ${clientName}. Zadanie: ${latestTask}`,
+          "success"
         );
 
         await loadClients();
       } catch (error) {
         showMessage(
           getFriendlyError(error),
-          "red"
+          "error"
         );
 
         console.error(error);
       } finally {
-        agentButton.disabled = false;
-        agentButton.textContent =
-          "Uruchom agenta";
+        button.disabled = false;
+        button.textContent = originalText;
       }
     }
 
+    function updateStatistics(clients) {
+      const highPriority = clients.filter(
+        (client) => client.priority === "WYSOKI"
+      ).length;
+
+      const contactClients = clients.filter(
+        (client) => client.status === "KONTAKT"
+      ).length;
+
+      const tasksCount = clients.reduce(
+        (total, client) => {
+          const tasks = Array.isArray(client.agent_tasks)
+            ? client.agent_tasks
+            : [];
+
+          return total + tasks.length;
+        },
+        0
+      );
+
+      document.getElementById(
+        "totalClients"
+      ).textContent = clients.length;
+
+      document.getElementById(
+        "highPriorityClients"
+      ).textContent = highPriority;
+
+      document.getElementById(
+        "contactClients"
+      ).textContent = contactClients;
+
+      document.getElementById(
+        "agentTasksCount"
+      ).textContent = tasksCount;
+
+      clientsCounter.textContent =
+        clients.length === 1
+          ? "1 klient"
+          : `${clients.length} klientów`;
+    }
+
+    function createBadge(text, className) {
+      const badge = document.createElement("span");
+
+      badge.className = `badge ${className}`;
+      badge.textContent = text;
+
+      return badge;
+    }
+
+    function createClientCard(client) {
+      const clientCard =
+        document.createElement("article");
+
+      clientCard.className = "client-card";
+
+      const header =
+        document.createElement("div");
+
+      header.className = "client-header";
+
+      const identity =
+        document.createElement("div");
+
+      const name =
+        document.createElement("h3");
+
+      name.className = "client-name";
+      name.textContent = client.name;
+
+      const email =
+        document.createElement("a");
+
+      email.className = "client-email";
+      email.href = `mailto:${client.email}`;
+      email.textContent = client.email;
+
+      identity.appendChild(name);
+      identity.appendChild(email);
+
+      const badges =
+        document.createElement("div");
+
+      badges.className = "badges";
+
+      badges.appendChild(
+        createBadge(
+          client.status || "NOWY",
+          "status-badge"
+        )
+      );
+
+      badges.appendChild(
+        createBadge(
+          `Priorytet: ${client.priority || "ŚREDNI"}`,
+          getPriorityClass(client.priority)
+        )
+      );
+
+      header.appendChild(identity);
+      header.appendChild(badges);
+
+      const noteBox =
+        document.createElement("div");
+
+      noteBox.className = "note-box";
+
+      const noteLabel =
+        document.createElement("span");
+
+      noteLabel.className = "section-label";
+      noteLabel.textContent = "Notatka";
+
+      const noteText =
+        document.createElement("div");
+
+      noteText.textContent =
+        client.note || "Brak notatki";
+
+      noteBox.appendChild(noteLabel);
+      noteBox.appendChild(noteText);
+
+      const aiBox =
+        document.createElement("div");
+
+      aiBox.className = "ai-box";
+
+      const aiTitle =
+        document.createElement("p");
+
+      aiTitle.className = "ai-title";
+      aiTitle.textContent = "✦ Analiza AI";
+
+      const summary =
+        document.createElement("p");
+
+      summary.className = "ai-content";
+      summary.textContent =
+        client.summary || "Brak analizy AI";
+
+      const nextAction =
+        document.createElement("div");
+
+      nextAction.className = "next-action";
+
+      const nextActionLabel =
+        document.createElement("span");
+
+      nextActionLabel.className = "section-label";
+      nextActionLabel.textContent = "Następny krok";
+
+      const nextActionText =
+        document.createElement("div");
+
+      nextActionText.textContent =
+        client.next_action ||
+        "Brak rekomendowanego działania";
+
+      nextAction.appendChild(nextActionLabel);
+      nextAction.appendChild(nextActionText);
+
+      aiBox.appendChild(aiTitle);
+      aiBox.appendChild(summary);
+      aiBox.appendChild(nextAction);
+
+      clientCard.appendChild(header);
+      clientCard.appendChild(noteBox);
+      clientCard.appendChild(aiBox);
+
+      const tasks = Array.isArray(client.agent_tasks)
+        ? client.agent_tasks
+        : [];
+
+      if (tasks.length > 0) {
+        const latestTask = tasks[0];
+
+        const taskBox =
+          document.createElement("div");
+
+        taskBox.className = "agent-task";
+
+        const taskHeader =
+          document.createElement("div");
+
+        taskHeader.className = "task-header";
+
+        const taskTitle =
+          document.createElement("span");
+
+        taskTitle.className = "task-title";
+        taskTitle.textContent = "Zadanie agenta";
+
+        const taskStatus =
+          document.createElement("span");
+
+        taskStatus.className = "task-status";
+        taskStatus.textContent =
+          latestTask.status || "OPEN";
+
+        const taskText =
+          document.createElement("p");
+
+        taskText.className = "task-text";
+        taskText.textContent = latestTask.action;
+
+        taskHeader.appendChild(taskTitle);
+        taskHeader.appendChild(taskStatus);
+
+        taskBox.appendChild(taskHeader);
+        taskBox.appendChild(taskText);
+
+        clientCard.appendChild(taskBox);
+      }
+
+      const actions =
+        document.createElement("div");
+
+      actions.className = "actions";
+
+      const agentButton =
+        document.createElement("button");
+
+      agentButton.type = "button";
+      agentButton.className =
+        "action-button agent-button";
+
+      agentButton.textContent = "✦ Uruchom agenta";
+
+      agentButton.addEventListener("click", () => {
+        runAgent(
+          client.id,
+          client.name,
+          agentButton
+        );
+      });
+
+      const editButton =
+        document.createElement("button");
+
+      editButton.type = "button";
+      editButton.className =
+        "action-button edit-button";
+
+      editButton.textContent = "Edytuj";
+
+      editButton.addEventListener("click", () => {
+        startEditing(client);
+      });
+
+      const deleteButton =
+        document.createElement("button");
+
+      deleteButton.type = "button";
+      deleteButton.className =
+        "action-button delete-button";
+
+      deleteButton.textContent = "Usuń";
+
+      deleteButton.addEventListener("click", () => {
+        deleteClient(client.id, client.name);
+      });
+
+      actions.appendChild(agentButton);
+      actions.appendChild(editButton);
+      actions.appendChild(deleteButton);
+
+      clientCard.appendChild(actions);
+
+      return clientCard;
+    }
+
     async function loadClients() {
+      clientsList.innerHTML = `
+        <div class="loading-state">
+          Pobieranie klientów...
+        </div>
+      `;
+
       try {
         const response = await fetch(
           `${API_URL}/clients`
@@ -432,305 +1452,49 @@
         const clients = await response.json();
 
         clientsList.innerHTML = "";
+        updateStatistics(clients);
 
         if (clients.length === 0) {
-          clientsList.textContent =
-            "Brak klientów w bazie.";
+          clientsList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">+</div>
+              <strong>Brak klientów</strong>
+              <p>Dodaj pierwszego klienta za pomocą formularza.</p>
+            </div>
+          `;
 
           return;
         }
 
         clients.forEach((client) => {
-          const clientElement =
-            document.createElement("div");
-
-          clientElement.className = "client";
-
-          const headerElement =
-            document.createElement("div");
-
-          headerElement.className =
-            "client-header";
-
-          const nameElement =
-            document.createElement("strong");
-
-          nameElement.textContent = client.name;
-
-          const badgesElement =
-            document.createElement("div");
-
-          badgesElement.className = "badges";
-
-          const statusElement =
-            document.createElement("span");
-
-          statusElement.className = "badge";
-
-          statusElement.textContent =
-            client.status || "NOWY";
-
-          const priorityElement =
-            document.createElement("span");
-
-          priorityElement.className =
-            `badge ${getPriorityClass(
-              client.priority
-            )}`;
-
-          priorityElement.textContent =
-            `Priorytet: ${
-              client.priority || "ŚREDNI"
-            }`;
-
-          badgesElement.appendChild(
-            statusElement
-          );
-
-          badgesElement.appendChild(
-            priorityElement
-          );
-
-          headerElement.appendChild(
-            nameElement
-          );
-
-          headerElement.appendChild(
-            badgesElement
-          );
-
-          const emailElement =
-            document.createElement("p");
-
-          emailElement.textContent =
-            `Email: ${client.email}`;
-
-          const noteElement =
-            document.createElement("p");
-
-          noteElement.textContent =
-            `Notatka: ${
-              client.note || "Brak"
-            }`;
-
-          const aiInsightsElement =
-            document.createElement("div");
-
-          aiInsightsElement.className =
-            "ai-insights";
-
-          const summaryElement =
-            document.createElement("p");
-
-          const summaryLabel =
-            document.createElement("strong");
-
-          summaryLabel.className = "ai-label";
-          summaryLabel.textContent =
-            "AI Summary: ";
-
-          summaryElement.appendChild(
-            summaryLabel
-          );
-
-          summaryElement.append(
-            client.summary || "Brak analizy AI"
-          );
-
-          const nextActionElement =
-            document.createElement("p");
-
-          const nextActionLabel =
-            document.createElement("strong");
-
-          nextActionLabel.className =
-            "ai-label";
-
-          nextActionLabel.textContent =
-            "Next action: ";
-
-          nextActionElement.appendChild(
-            nextActionLabel
-          );
-
-          nextActionElement.append(
-            client.next_action ||
-            "Brak rekomendowanego działania"
-          );
-
-          aiInsightsElement.appendChild(
-            summaryElement
-          );
-
-          aiInsightsElement.appendChild(
-            nextActionElement
-          );
-
-          const agentTaskElement =
-            document.createElement("div");
-
-          agentTaskElement.className =
-            "agent-task";
-
-          const latestAgentTask =
-            client.agent_tasks?.[0];
-
-          if (latestAgentTask) {
-            const agentTaskLabel =
-              document.createElement("strong");
-
-            agentTaskLabel.className =
-              "agent-task-label";
-
-            agentTaskLabel.textContent =
-              "Zadanie agenta: ";
-
-            agentTaskElement.appendChild(
-              agentTaskLabel
-            );
-
-            agentTaskElement.append(
-              latestAgentTask.action
-            );
-          } else {
-            agentTaskElement.style.display =
-              "none";
-          }
-
-          const actionsElement =
-            document.createElement("div");
-
-          actionsElement.className = "actions";
-
-          const agentButton =
-            document.createElement("button");
-
-          agentButton.type = "button";
-          agentButton.className =
-            "agent-button";
-
-          agentButton.textContent =
-            "Uruchom agenta";
-
-          agentButton.addEventListener(
-            "click",
-            () => {
-              runAgent(
-                client.id,
-                client.name,
-                agentButton
-              );
-            }
-          );
-
-          const editButton =
-            document.createElement("button");
-
-          editButton.type = "button";
-          editButton.className =
-            "edit-button";
-
-          editButton.textContent = "Edytuj";
-
-          editButton.addEventListener(
-            "click",
-            () => {
-              startEditing(client);
-            }
-          );
-
-          const deleteButton =
-            document.createElement("button");
-
-          deleteButton.type = "button";
-          deleteButton.className =
-            "delete-button";
-
-          deleteButton.textContent = "Usuń";
-
-          deleteButton.addEventListener(
-            "click",
-            () => {
-              deleteClient(
-                client.id,
-                client.name
-              );
-            }
-          );
-
-          actionsElement.appendChild(
-            agentButton
-          );
-
-          actionsElement.appendChild(
-            editButton
-          );
-
-          actionsElement.appendChild(
-            deleteButton
-          );
-
-          clientElement.appendChild(
-            headerElement
-          );
-
-          clientElement.appendChild(
-            emailElement
-          );
-
-          clientElement.appendChild(
-            noteElement
-          );
-
-          clientElement.appendChild(
-            aiInsightsElement
-          );
-
-          clientElement.appendChild(
-            agentTaskElement
-          );
-
-          clientElement.appendChild(
-            actionsElement
-          );
-
           clientsList.appendChild(
-            clientElement
+            createClientCard(client)
           );
         });
       } catch (error) {
-        clientsList.textContent =
-          "Nie udało się pobrać klientów.";
+        clientsList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">!</div>
+            <strong>Nie udało się pobrać klientów</strong>
+            <p>Sprawdź, czy backend jest uruchomiony.</p>
+          </div>
+        `;
 
         console.error(error);
       }
     }
 
-    clientForm.addEventListener(
-      "input",
-      () => {
-        clearMessage();
-      }
-    );
+    clientForm.addEventListener("input", clearMessage);
+    clientForm.addEventListener("change", clearMessage);
 
-    clientForm.addEventListener(
-      "change",
-      () => {
-        clearMessage();
-      }
-    );
+    cancelButton.addEventListener("click", () => {
+      resetForm();
 
-    cancelButton.addEventListener(
-      "click",
-      () => {
-        resetForm();
-
-        showMessage(
-          "Edycja została anulowana.",
-          "#475569"
-        );
-      }
-    );
+      showMessage(
+        "Edycja została anulowana.",
+        "info"
+      );
+    });
 
     clientForm.addEventListener(
       "submit",
@@ -738,27 +1502,25 @@
         event.preventDefault();
         clearMessage();
 
+        const isEditing =
+          editingClientId !== null;
+
         const clientData = {
           name:
-            document.getElementById("name").value,
+            document.getElementById("name").value.trim(),
 
           email:
-            document.getElementById("email").value,
+            document.getElementById("email").value.trim(),
 
           note:
-            document.getElementById("note").value,
+            document.getElementById("note").value.trim(),
 
           status:
             document.getElementById("status").value,
 
           priority:
-            document.getElementById(
-              "priority"
-            ).value,
+            document.getElementById("priority").value,
         };
-
-        const isEditing =
-          editingClientId !== null;
 
         const requestUrl = isEditing
           ? `${API_URL}/api/clients/${editingClientId}`
@@ -772,44 +1534,41 @@
 
         submitButton.textContent = isEditing
           ? "Zapisywanie..."
-          : "AI analizuje...";
+          : "AI analizuje klienta...";
 
         try {
-          const response = await fetch(
-            requestUrl,
-            {
-              method: requestMethod,
+          const response = await fetch(requestUrl, {
+            method: requestMethod,
 
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
+            headers: {
+              "Content-Type": "application/json",
+            },
 
-              body: JSON.stringify(clientData),
-            }
-          );
+            body: JSON.stringify(clientData),
+          });
 
-          const result =
-            await response.json();
+          const result = await response.json();
 
           if (!response.ok) {
-            throw new Error(result.error);
+            throw new Error(
+              result.error ||
+              "Nie udało się zapisać klienta."
+            );
           }
 
           showMessage(
             isEditing
-              ? "Zmiany klienta zostały zapisane!"
-              : "Klient został zapisany wraz z analizą AI!",
-            "green"
+              ? "Zmiany klienta zostały zapisane."
+              : "Klient został zapisany i przeanalizowany przez AI.",
+            "success"
           );
 
           resetForm();
-
           await loadClients();
         } catch (error) {
           showMessage(
             getFriendlyError(error),
-            "red"
+            "error"
           );
 
           console.error(error);
