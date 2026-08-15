@@ -142,9 +142,11 @@
       <select id="status">
         <option value="NOWY">Nowy</option>
         <option value="KONTAKT">Kontakt</option>
+
         <option value="ZAINTERESOWANY">
           Zainteresowany
         </option>
+
         <option value="ZAMKNIĘTY">Zamknięty</option>
       </select>
 
@@ -197,6 +199,30 @@
     const clientsList =
       document.getElementById("clientsList");
 
+    function clearMessage() {
+      message.textContent = "";
+      message.style.color = "";
+    }
+
+    function showMessage(text, color) {
+      message.textContent = text;
+      message.style.color = color;
+    }
+
+    function getFriendlyError(error) {
+      if (
+        error.message === "Failed to fetch" ||
+        error.message.includes("fetch")
+      ) {
+        return "Nie udało się połączyć z backendem.";
+      }
+
+      return (
+        error.message ||
+        "Wystąpił nieoczekiwany błąd."
+      );
+    }
+
     function getPriorityClass(priority) {
       if (priority === "WYSOKI") {
         return "priority-high";
@@ -219,6 +245,8 @@
     }
 
     function startEditing(client) {
+      clearMessage();
+
       editingClientId = client.id;
 
       document.getElementById("name").value =
@@ -249,6 +277,8 @@
     }
 
     async function deleteClient(clientId, clientName) {
+      clearMessage();
+
       const confirmed = confirm(
         `Czy na pewno usunąć klienta ${clientName}?`
       );
@@ -275,17 +305,17 @@
           resetForm();
         }
 
-        message.textContent =
-          `Klient ${clientName} został usunięty.`;
-
-        message.style.color = "green";
+        showMessage(
+          `Klient ${clientName} został usunięty.`,
+          "green"
+        );
 
         await loadClients();
       } catch (error) {
-        message.textContent =
-          error.message || "Nie udało się usunąć klienta.";
-
-        message.style.color = "red";
+        showMessage(
+          getFriendlyError(error),
+          "red"
+        );
 
         console.error(error);
       }
@@ -296,6 +326,12 @@
         const response = await fetch(
           `${API_URL}/clients`
         );
+
+        if (!response.ok) {
+          throw new Error(
+            "Nie udało się pobrać klientów."
+          );
+        }
 
         const clients = await response.json();
 
@@ -333,6 +369,7 @@
             document.createElement("span");
 
           statusElement.className = "badge";
+
           statusElement.textContent =
             client.status || "NOWY";
 
@@ -408,23 +445,35 @@
       }
     }
 
+    clientForm.addEventListener("input", () => {
+      clearMessage();
+    });
+
+    clientForm.addEventListener("change", () => {
+      clearMessage();
+    });
+
     cancelButton.addEventListener("click", () => {
       resetForm();
 
-      message.textContent = "Edycja została anulowana.";
-      message.style.color = "#475569";
+      showMessage(
+        "Edycja została anulowana.",
+        "#475569"
+      );
     });
 
     clientForm.addEventListener(
       "submit",
       async (event) => {
         event.preventDefault();
+        clearMessage();
 
         const clientData = {
           name: document.getElementById("name").value,
           email: document.getElementById("email").value,
           note: document.getElementById("note").value,
           status: document.getElementById("status").value,
+
           priority:
             document.getElementById("priority").value,
         };
@@ -442,9 +491,11 @@
         try {
           const response = await fetch(requestUrl, {
             method: requestMethod,
+
             headers: {
               "Content-Type": "application/json",
             },
+
             body: JSON.stringify(clientData),
           });
 
@@ -454,21 +505,21 @@
             throw new Error(result.error);
           }
 
-          message.textContent = isEditing
-            ? "Zmiany klienta zostały zapisane!"
-            : "Klient został zapisany w bazie!";
-
-          message.style.color = "green";
+          showMessage(
+            isEditing
+              ? "Zmiany klienta zostały zapisane!"
+              : "Klient został zapisany w bazie!",
+            "green"
+          );
 
           resetForm();
 
           await loadClients();
         } catch (error) {
-          message.textContent =
-            error.message ||
-            "Nie udało się zapisać klienta.";
-
-          message.style.color = "red";
+          showMessage(
+            getFriendlyError(error),
+            "red"
+          );
 
           console.error(error);
         }
