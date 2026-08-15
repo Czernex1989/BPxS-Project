@@ -1,2 +1,5 @@
 backend/node_modules/
-.env
+backend/.env
+node_modules/
+test-results/
+playwright-report/
