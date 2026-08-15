@@ -3,6 +3,7 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 const { Pool } = require("pg");
+const OpenAI = require("openai");
 
 const app = express();
 const PORT = 3000;
@@ -14,6 +15,60 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+async function generateClientInsights(client) {
+  const response = await openai.responses.create({
+    model: "gpt-5.6-luna",
+
+    reasoning: {
+      effort: "none",
+    },
+
+    instructions:
+      "Jesteś asystentem sprzedaży w mini-CRM. " +
+      "Analizuj informacje o potencjalnym kliencie. " +
+      "Pisz krótko, konkretnie i po polsku.",
+
+    input: `
+Nazwa firmy: ${client.name}
+E-mail: ${client.email}
+Notatka: ${client.note || "Brak"}
+Status: ${client.status || "NOWY"}
+Priorytet: ${client.priority || "ŚREDNI"}
+`,
+
+    text: {
+      format: {
+        type: "json_schema",
+        name: "client_insights",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            summary: {
+              type: "string",
+              description:
+                "Krótkie podsumowanie klienta w maksymalnie dwóch zdaniach.",
+            },
+            next_action: {
+              type: "string",
+              description:
+                "Jedno konkretne następne działanie sprzedażowe.",
+            },
+          },
+          required: ["summary", "next_action"],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  return JSON.parse(response.output_text);
+}
 
 app.use(cors());
 app.use(express.json());
@@ -71,31 +126,45 @@ app.post("/api/clients", async (req, res) => {
       });
     }
 
+    const clientData = {
+      name,
+      email,
+      note: note || "",
+      status: status || "NOWY",
+      priority: priority || "ŚREDNI",
+    };
+
+    const aiInsights = await generateClientInsights(clientData);
+
     const result = await pool.query(
       `INSERT INTO clients (
         name,
         email,
         note,
         status,
-        priority
+        priority,
+        summary,
+        next_action
       )
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *`,
       [
-        name,
-        email,
-        note || "",
-        status || "NOWY",
-        priority || "ŚREDNI",
+        clientData.name,
+        clientData.email,
+        clientData.note,
+        clientData.status,
+        clientData.priority,
+        aiInsights.summary,
+        aiInsights.next_action,
       ]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    console.error("Błąd podczas dodawania klienta:", error);
 
     res.status(500).json({
-      error: "Nie udało się zapisać klienta",
+      error: "Nie udało się zapisać klienta lub wygenerować analizy AI",
     });
   }
 });

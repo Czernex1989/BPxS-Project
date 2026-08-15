@@ -114,7 +114,22 @@
     .delete-button {
       background-color: #dc2626;
     }
+.ai-insights {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+}
 
+.ai-insights p {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.ai-label {
+  color: #1e40af;
+}
     #message {
       font-weight: bold;
       margin-top: 15px;
@@ -400,6 +415,42 @@
           noteElement.textContent =
             `Notatka: ${client.note || "Brak"}`;
 
+          const aiInsightsElement =
+  document.createElement("div");
+
+aiInsightsElement.className = "ai-insights";
+
+const summaryElement =
+  document.createElement("p");
+
+const summaryLabel =
+  document.createElement("strong");
+
+summaryLabel.className = "ai-label";
+summaryLabel.textContent = "AI Summary: ";
+
+summaryElement.appendChild(summaryLabel);
+summaryElement.append(
+  client.summary || "Brak analizy AI"
+);
+
+const nextActionElement =
+  document.createElement("p");
+
+const nextActionLabel =
+  document.createElement("strong");
+
+nextActionLabel.className = "ai-label";
+nextActionLabel.textContent = "Next action: ";
+
+nextActionElement.appendChild(nextActionLabel);
+nextActionElement.append(
+  client.next_action || "Brak rekomendowanego działania"
+);
+
+aiInsightsElement.appendChild(summaryElement);
+aiInsightsElement.appendChild(nextActionElement);  
+
           const actionsElement =
             document.createElement("div");
 
@@ -432,8 +483,9 @@
 
           clientElement.appendChild(headerElement);
           clientElement.appendChild(emailElement);
-          clientElement.appendChild(noteElement);
-          clientElement.appendChild(actionsElement);
+        clientElement.appendChild(noteElement);
+clientElement.appendChild(aiInsightsElement);
+clientElement.appendChild(actionsElement);
 
           clientsList.appendChild(clientElement);
         });
