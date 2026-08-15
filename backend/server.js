@@ -4,6 +4,7 @@ const path = require("path");
 require("dotenv").config();
 const { Pool } = require("pg");
 const OpenAI = require("openai");
+const { runClientAgent } = require("./agent");
 
 const app = express();
 const PORT = 3000;
@@ -168,7 +169,72 @@ app.post("/api/clients", async (req, res) => {
     });
   }
 });
+app.post(
+  "/api/clients/:id/agent-run",
+  async (req, res) => {
+    try {
+      const clientId = Number(req.params.id);
 
+      if (!Number.isInteger(clientId)) {
+        return res.status(400).json({
+          error: "Nieprawidłowe ID klienta",
+        });
+      }
+
+      const clientResult = await pool.query(
+        `SELECT *
+         FROM clients
+         WHERE id = $1`,
+        [clientId]
+      );
+
+      if (clientResult.rows.length === 0) {
+        return res.status(404).json({
+          error: "Nie znaleziono klienta",
+        });
+      }
+
+      const client = clientResult.rows[0];
+
+      const agentResult = await runClientAgent(
+        client,
+        pool,
+        openai
+      );
+
+      const updatedClientResult = await pool.query(
+        `SELECT *
+         FROM clients
+         WHERE id = $1`,
+        [clientId]
+      );
+
+      const tasksResult = await pool.query(
+        `SELECT *
+         FROM agent_tasks
+         WHERE client_id = $1
+         ORDER BY id DESC`,
+        [clientId]
+      );
+
+      res.json({
+        message: "Agent zakończył pracę",
+        agent: agentResult,
+        client: updatedClientResult.rows[0],
+        tasks: tasksResult.rows,
+      });
+    } catch (error) {
+      console.error(
+        "Błąd podczas pracy agenta:",
+        error
+      );
+
+      res.status(500).json({
+        error: "Agent nie wykonał zadania",
+      });
+    }
+  }
+);
 app.put("/api/clients/:id", async (req, res) => {
   try {
     const clientId = req.params.id;
