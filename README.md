@@ -1,205 +1,445 @@
-# BPxS Mini CRM
+# BPxS AI CRM
 
-A full-stack mini CRM application created to learn how frontend, backend, REST API and PostgreSQL work together.
+BPxS AI CRM to mini system CRM zbudowany jako projekt end-to-end. Aplikacja pozwala zarządzać klientami, przechowywać dane w PostgreSQL, generować analizę klienta przez AI oraz uruchamiać agenta tworzącego zadania i aktualizującego status klienta.
 
-The application allows users to manage potential customers and stores their data in a PostgreSQL database.
+Projekt łączy klasyczny CRUD, REST API, bazę danych, OpenAI API, agent loop, automatyzację n8n oraz testy Playwright E2E.
 
-## Features
+## Podgląd aplikacji
 
-- Display all customers
-- Add a new customer
-- Edit customer information
-- Delete a customer
-- PostgreSQL database integration
-- REST API with full CRUD operations
-- Manual API and application testing
-- End-to-end test created with Playwright
+![BPxS AI CRM Dashboard](docs/bpxs-ai-crm-dashboard.png)
 
-## Technologies
+## Najważniejsze funkcje
 
-- HTML
-- CSS
+- dodawanie klientów,
+- wyświetlanie listy klientów,
+- edytowanie danych klienta,
+- usuwanie klientów,
+- zapisywanie danych w PostgreSQL,
+- generowanie podsumowania klienta przez AI,
+- generowanie rekomendowanego następnego działania,
+- uruchamianie agenta AI dla wybranego klienta,
+- tworzenie zadań follow-up przez agenta,
+- aktualizowanie statusu klienta przez agenta,
+- wyświetlanie zadań agenta na karcie klienta,
+- automatyczne usuwanie zadań po usunięciu klienta,
+- zabezpieczenie przed wielokrotnym wysłaniem formularza,
+- statystyki klientów i zadań,
+- automatyczne dodawanie klientów przez workflow n8n,
+- testy end-to-end w Playwright.
+
+## Architektura
+
+Przepływ ręcznego dodawania klienta:
+
+```text
+Frontend
+   ↓
+Express REST API
+   ↓
+OpenAI API
+   ↓
+PostgreSQL
+   ↓
+Odpowiedź API
+   ↓
+Aktualizacja interfejsu CRM
+```
+
+Przepływ automatyzacji n8n:
+
+```text
+n8n Form
+   ↓
+Edit Fields
+   ↓
+POST /api/clients
+   ↓
+Express API
+   ↓
+OpenAI API
+   ↓
+PostgreSQL
+```
+
+Przepływ agenta:
+
+```text
+Użytkownik klika „Uruchom agenta”
+   ↓
+POST /api/clients/:id/agent-run
+   ↓
+Agent pobiera dane klienta
+   ↓
+Model wybiera dostępne narzędzie
+   ↓
+Utworzenie zadania lub aktualizacja statusu
+   ↓
+Zapis wyniku w PostgreSQL
+   ↓
+Odświeżenie karty klienta
+```
+
+## Agent AI
+
+Agent korzysta z mechanizmu function calling i może samodzielnie wybrać odpowiednią operację na podstawie danych klienta.
+
+Dostępne narzędzia:
+
+### `create_follow_up_task`
+
+Tworzy zadanie follow-up dla klienta i zapisuje je w tabeli `agent_tasks`.
+
+### `update_client_status`
+
+Aktualizuje status klienta w tabeli `clients`.
+
+Agent działa w ograniczonej pętli, dzięki czemu może wykonać kolejne kroki, ale nie działa bez końca.
+
+## Technologie
+
+### Frontend
+
+- HTML5
+- CSS3
 - JavaScript
-- Node.js
-- Express.js
-- PostgreSQL
-- Playwright
-- Git and GitHub
+- Fetch API
+- responsywny interfejs
 
-## Project Structure
+### Backend
+
+- Node.js
+- Express
+- PostgreSQL
+- `pg`
+- `dotenv`
+- `cors`
+- OpenAI SDK
+
+### AI i automatyzacja
+
+- OpenAI API
+- function calling
+- agent loop
+- n8n
+
+### Testy i narzędzia
+
+- Playwright
+- Git
+- GitHub
+- Visual Studio Code
+- PowerShell
+
+## Struktura projektu
 
 ```text
 BPxS-Project/
 ├── backend/
+│   ├── agent.js
 │   ├── server.js
 │   ├── package.json
+│   ├── package-lock.json
 │   └── .env
 ├── frontend/
 │   └── index.html
+├── n8n/
+│   └── BPxS CRM - Add client.json
 ├── tests/
-│   └── crm.spec.js
+├── docs/
+│   └── bpxs-ai-crm-dashboard.png
 ├── .gitignore
 ├── package.json
+├── package-lock.json
 ├── README.md
 └── Testing.md
 ```
 
-## How It Works
+Plik `.env` znajduje się w `.gitignore` i nie powinien być dodawany do repozytorium.
 
-1. The frontend sends HTTP requests to the REST API.
-2. The backend receives and processes the requests.
-3. The backend communicates with the PostgreSQL database.
-4. PostgreSQL stores and returns customer data.
-5. The backend sends a response to the frontend.
-6. The frontend displays the updated customer list.
+## Wymagania
 
-## API Endpoints
+Do uruchomienia projektu potrzebne są:
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/clients` | Returns all clients |
-| POST | `/api/clients` | Creates a new client |
-| PUT | `/api/clients/:id` | Updates an existing client |
-| DELETE | `/api/clients/:id` | Deletes a client |
-| GET | `/db-test` | Checks the PostgreSQL connection |
+- Node.js,
+- npm,
+- PostgreSQL,
+- klucz OpenAI API,
+- Git,
+- przeglądarka internetowa.
 
-## Running the Project Locally
+n8n jest potrzebne tylko do uruchomienia dodatkowej automatyzacji formularza.
 
-### 1. Clone the repository
+## Instalacja
+
+### 1. Sklonowanie repozytorium
 
 ```bash
 git clone https://github.com/Czernex1989/BPxS-Project.git
 cd BPxS-Project
 ```
 
-### 2. Install the backend dependencies
+### 2. Instalacja zależności backendu
 
 ```bash
 cd backend
 npm install
 ```
 
-### 3. Configure PostgreSQL
+### 3. Konfiguracja zmiennych środowiskowych
 
-Create a `.env` file inside the `backend` directory:
+W folderze `backend` utwórz plik `.env`:
 
 ```env
-DB_USER=your_postgres_user
+DB_USER=postgres
 DB_HOST=localhost
-DB_NAME=your_database_name
-DB_PASSWORD=your_postgres_password
+DB_NAME=bpxs_crm
+DB_PASSWORD=TWOJE_HASLO
 DB_PORT=5432
+OPENAI_API_KEY=TWOJ_KLUCZ_OPENAI
 ```
 
-The `.env` file contains private database credentials and is not included in the repository.
+Nie wpisuj prawdziwego klucza ani hasła do README i nie dodawaj pliku `.env` do repozytorium.
 
-### 4. Start the application
+## Konfiguracja PostgreSQL
 
-Run this command from the `backend` directory:
+### Tabela klientów
+
+```sql
+CREATE TABLE clients (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  note TEXT,
+  status VARCHAR(50) DEFAULT 'NOWY',
+  priority VARCHAR(50) DEFAULT 'ŚREDNI',
+  summary TEXT,
+  next_action TEXT
+);
+```
+
+### Tabela zadań agenta
+
+```sql
+CREATE TABLE agent_tasks (
+  id SERIAL PRIMARY KEY,
+  client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
+  action TEXT NOT NULL,
+  status VARCHAR(20) DEFAULT 'OPEN',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+Relacja `ON DELETE CASCADE` powoduje, że zadania przypisane do klienta są automatycznie usuwane razem z nim.
+
+## Uruchomienie aplikacji
+
+Przejdź do folderu backendu:
 
 ```bash
+cd backend
 node server.js
 ```
 
-Open the application in your browser:
+Po uruchomieniu terminal powinien wyświetlić:
+
+```text
+Backend działa na http://localhost:3000
+```
+
+Aplikacja jest dostępna pod adresem:
 
 ```text
 http://localhost:3000
 ```
 
-### 5. Run the Playwright test
+## Endpointy API
 
-Open another terminal in the main project directory:
+### Test połączenia z bazą
 
-```bash
-npm install
-npx playwright test
+```http
+GET /db-test
 ```
 
-## Testing
+### Pobieranie klientów i ich zadań
 
-The project includes:
-
-- Manual CRUD testing
-- PostgreSQL connection testing
-- REST API testing
-- Playwright end-to-end testing
-
-Detailed manual test cases are available in [Testing.md](Testing.md).
-
-## n8n Automation
-
-The project includes an n8n workflow that automatically adds a new client to the mini-CRM.
-
-### How It Works
-
-1. A user submits the n8n form.
-2. The **Edit Fields** node prepares the client data.
-3. The **HTTP Request** node sends a POST request to the CRM API.
-4. The backend validates the data and saves the client in PostgreSQL.
-5. The new client appears in the mini-CRM interface.
-
-### Workflow
-
-```text
-n8n Form → Edit Fields → POST /api/clients → Express API → PostgreSQL → CRM
+```http
+GET /clients
 ```
 
-The workflow sends the following data:
+### Dodawanie klienta
+
+```http
+POST /api/clients
+```
+
+Przykładowe body:
 
 ```json
 {
-  "name": "Example Company",
-  "email": "contact@example.com",
-  "note": "Client interested in process automation.",
+  "name": "Baltic Automation",
+  "email": "kontakt@balticautomation.pl",
+  "note": "Firma chce automatycznie obsługiwać zapytania klientów.",
   "status": "NOWY",
-  "priority": "ŚREDNI"
+  "priority": "WYSOKI"
 }
 ```
 
-### Running the Automation Locally
+### Edycja klienta
 
-The backend and n8n must run at the same time in separate terminals.
-
-Start the backend:
-
-```bash
-cd backend
-node server.js
+```http
+PUT /api/clients/:id
 ```
 
-Start n8n in a second terminal:
+### Usuwanie klienta
 
-```bash
-npx n8n
+```http
+DELETE /api/clients/:id
 ```
 
-Open n8n:
+### Uruchomienie agenta
 
-```text
-http://localhost:5678
+```http
+POST /api/clients/:id/agent-run
 ```
 
-The HTTP Request node sends client data to:
+Agent analizuje wybranego klienta, może utworzyć zadanie follow-up oraz zaktualizować jego status.
 
-```text
-POST http://localhost:3000/api/clients
-```
+## Automatyzacja n8n
 
-### Importing the Workflow
-
-The exported workflow is available in:
+Workflow znajduje się w folderze:
 
 ```text
 n8n/BPxS CRM - Add client.json
 ```
 
-To use it:
+Workflow realizuje proces:
 
-1. Open n8n.
-2. Import the workflow JSON file.
-3. Start the CRM backend.
-4. Publish the workflow.
-5. Open the production form URL and submit a new client.
+```text
+n8n Form → Edit Fields → POST /api/clients → Express API → PostgreSQL
+```
 
-> The current workflow uses localhost addresses and works while the backend and n8n are running locally.
+Plik JSON można zaimportować do n8n przez opcję importowania workflow z pliku.
+
+Workflow został przetestowany przez Production URL formularza n8n.
+
+## Testy Playwright
+
+Instalacja przeglądarki Playwright:
+
+```bash
+npx playwright install
+```
+
+Uruchomienie testów:
+
+```bash
+npx playwright test
+```
+
+Uruchomienie testów z widoczną przeglądarką:
+
+```bash
+npx playwright test --headed
+```
+
+Wyświetlenie raportu:
+
+```bash
+npx playwright show-report
+```
+
+Szczegóły testów manualnych znajdują się w pliku `Testing.md`.
+
+## Przetestowane scenariusze
+
+- połączenie backendu z PostgreSQL,
+- pobieranie klientów z bazy,
+- dodawanie klienta,
+- walidacja wymaganych pól,
+- walidacja adresu e-mail,
+- edytowanie klienta,
+- usuwanie klienta,
+- zachowanie danych po ponownym uruchomieniu aplikacji,
+- zabezpieczenie przed utworzeniem duplikatu przez wielokrotne kliknięcie,
+- generowanie podsumowania AI,
+- generowanie rekomendowanego następnego działania,
+- uruchomienie agenta,
+- utworzenie zadania follow-up,
+- aktualizacja liczników w interfejsie,
+- automatyczne usunięcie zadania razem z klientem,
+- dodanie klienta przez workflow n8n.
+
+## Bezpieczeństwo
+
+Projekt wykorzystuje zmienne środowiskowe do przechowywania:
+
+- klucza OpenAI API,
+- hasła PostgreSQL,
+- danych połączenia z bazą.
+
+Pliki zawierające sekrety są wykluczone z repozytorium przez `.gitignore`.
+
+Przykładowe wpisy:
+
+```gitignore
+backend/.env
+.env
+backend/node_modules/
+node_modules/
+test-results/
+playwright-report/
+```
+
+Jeśli klucz API zostanie przypadkowo ujawniony, należy go natychmiast unieważnić i wygenerować nowy.
+
+## Aktualny zakres projektu
+
+Projekt zawiera działające MVP systemu CRM z:
+
+- pełnym CRUD-em,
+- trwałym zapisem danych,
+- analizą AI,
+- agentem korzystającym z narzędzi,
+- automatyzacją n8n,
+- testami E2E,
+- responsywnym panelem użytkownika.
+
+## Możliwe dalsze rozszerzenia
+
+- logowanie i autoryzacja użytkowników,
+- filtrowanie i wyszukiwanie klientów,
+- oznaczanie zadań jako wykonane,
+- historia działań agenta,
+- terminy wykonania zadań,
+- powiadomienia e-mail,
+- wdrożenie aplikacji online,
+- konteneryzacja przez Docker,
+- testy API,
+- limity kosztów wywołań AI.
+
+## Autor
+
+**Artur Czernek**
+
+Projekt wykonany jako praktyczne ćwiczenie integracji:
+
+- aplikacji webowej,
+- REST API,
+- PostgreSQL,
+- sztucznej inteligencji,
+- agentów AI,
+- automatyzacji,
+- testów end-to-end.
+
+## Status projektu
+
+✅ CRUD działa  
+✅ PostgreSQL działa  
+✅ analiza AI działa  
+✅ agent loop działa  
+✅ zadania agenta są zapisywane  
+✅ automatyzacja n8n działa  
+✅ testy Playwright działają  
+✅ nowy interfejs działa  
+
+**BPxS AI CRM jest ukończony jako działający projekt portfolio.**
