@@ -1,0 +1,24 @@
+{
+  "name": "bpxs-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Czernex1989/BPxS-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Czernex1989/BPxS-Project/issues"
+  },
+  "homepage": "https://github.com/Czernex1989/BPxS-Project#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

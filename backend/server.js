@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 const { Pool } = require("pg");
 
@@ -17,9 +18,9 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("BPxS backend działa!");
-});
+app.use(
+  express.static(path.join(__dirname, "../frontend"))
+);
 
 app.get("/db-test", async (req, res) => {
   try {
