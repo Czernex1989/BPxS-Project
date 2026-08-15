@@ -1,0 +1,166 @@
+{
+  "name": "BPxS CRM - Add client",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "967bfcc4-7d90-4b66-ab3b-50db2ac3a606",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "324deb5a-1c29-41d4-8fdb-9da3612f4f6c",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "e2a5eb18-3e69-4ed1-815f-0c734561f080",
+              "name": "note",
+              "value": "={{ $json.note }}",
+              "type": "string"
+            },
+            {
+              "id": "d95a04a0-11f9-4a20-997e-75b73a7d8f47",
+              "name": "status",
+              "value": "NOWY",
+              "type": "string"
+            },
+            {
+              "id": "a69dbd65-76f1-4c93-9b23-469b2a306f19",
+              "name": "priority",
+              "value": "ŚREDNI",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "862ca63a-f838-4335-9a56-3ef180fe5874",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "name": "note",
+              "value": "={{ $json.note }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "priority",
+              "value": "={{ $json.priority }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "1b8b60d7-ef1d-4ccc-93eb-a3c9bfec0513",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "formTitle": "Dodaj klienta do BPxS CRM",
+        "formDescription": "Wypełnij formularz, aby automatycznie dodać klienta do systemu CRM.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "nazwa firmy",
+              "fieldName": "name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Adres e-mail",
+              "fieldName": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "wiadomość",
+              "fieldType": "textarea",
+              "fieldName": "note",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -64,
+        -176
+      ],
+      "id": "dd4a7004-a95e-4414-bcc2-d9d55b7a39f9",
+      "name": "On form submission",
+      "webhookId": "79aa6fe7-633a-460c-b320-7ce763bca061"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "290ea1ca-e0e5-4eb0-8c09-e0f134d4c3c5",
+  "meta": {
+    "instanceId": "db4e94acd30027539f681851a75d70808eb23b99445d5e8ba169829dca760dce"
+  },
+  "nodeGroups": [],
+  "id": "NQIXLpD7ztwMKqYD",
+  "tags": []
+}
