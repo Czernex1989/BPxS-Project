@@ -2,7 +2,10 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>BPxS Mini CRM</title>
 
@@ -43,6 +46,11 @@
 
     button:hover {
       opacity: 0.9;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
     }
 
     .cancel-button {
@@ -95,6 +103,36 @@
       color: #166534;
     }
 
+    .ai-insights {
+      margin-top: 12px;
+      padding: 12px;
+      background-color: #ffffff;
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+    }
+
+    .ai-insights p {
+      margin: 6px 0;
+      line-height: 1.4;
+    }
+
+    .ai-label {
+      color: #1e40af;
+    }
+
+    .agent-task {
+      margin-top: 12px;
+      padding: 12px;
+      background-color: #f5f3ff;
+      border-left: 4px solid #7c3aed;
+      border-radius: 6px;
+      line-height: 1.4;
+    }
+
+    .agent-task-label {
+      color: #6d28d9;
+    }
+
     .actions {
       display: flex;
       gap: 10px;
@@ -106,21 +144,11 @@
       padding: 7px 12px;
       margin: 0;
     }
-    .agent-task {
-  margin-top: 12px;
-  padding: 12px;
-  background-color: #f5f3ff;
-  border-left: 4px solid #7c3aed;
-  border-radius: 6px;
-  line-height: 1.4;
-}
 
-.agent-task-label {
-  color: #6d28d9;
-}
-.agent-button {
-  background-color: #7c3aed;
-}
+    .agent-button {
+      background-color: #7c3aed;
+    }
+
     .edit-button {
       background-color: #d97706;
     }
@@ -128,22 +156,7 @@
     .delete-button {
       background-color: #dc2626;
     }
-.ai-insights {
-  margin-top: 12px;
-  padding: 12px;
-  background-color: #ffffff;
-  border: 1px solid #c7d2fe;
-  border-radius: 6px;
-}
 
-.ai-insights p {
-  margin: 6px 0;
-  line-height: 1.4;
-}
-
-.ai-label {
-  color: #1e40af;
-}
     #message {
       font-weight: bold;
       margin-top: 15px;
@@ -171,18 +184,20 @@
       <select id="status">
         <option value="NOWY">Nowy</option>
         <option value="KONTAKT">Kontakt</option>
-
         <option value="ZAINTERESOWANY">
           Zainteresowany
         </option>
-
-        <option value="ZAMKNIĘTY">Zamknięty</option>
+        <option value="ZAMKNIĘTY">
+          Zamknięty
+        </option>
       </select>
 
       <label for="priority">Priorytet:</label>
       <select id="priority">
         <option value="NISKI">Niski</option>
-        <option value="ŚREDNI" selected>Średni</option>
+        <option value="ŚREDNI" selected>
+          Średni
+        </option>
         <option value="WYSOKI">Wysoki</option>
       </select>
 
@@ -270,6 +285,7 @@
 
       formTitle.textContent = "Dodaj klienta";
       submitButton.textContent = "Dodaj klienta";
+      submitButton.disabled = false;
       cancelButton.style.display = "none";
     }
 
@@ -305,7 +321,10 @@
       });
     }
 
-    async function deleteClient(clientId, clientName) {
+    async function deleteClient(
+      clientId,
+      clientName
+    ) {
       clearMessage();
 
       const confirmed = confirm(
@@ -349,52 +368,55 @@
         console.error(error);
       }
     }
-async function runAgent(
-  clientId,
-  clientName,
-  agentButton
-) {
-  clearMessage();
 
-  agentButton.disabled = true;
-  agentButton.textContent = "Agent pracuje...";
+    async function runAgent(
+      clientId,
+      clientName,
+      agentButton
+    ) {
+      clearMessage();
 
-  try {
-    const response = await fetch(
-      `${API_URL}/api/clients/${clientId}/agent-run`,
-      {
-        method: "POST",
+      agentButton.disabled = true;
+      agentButton.textContent = "Agent pracuje...";
+
+      try {
+        const response = await fetch(
+          `${API_URL}/api/clients/${clientId}/agent-run`,
+          {
+            method: "POST",
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error);
+        }
+
+        const newestTask = result.tasks[0];
+
+        showMessage(
+          newestTask
+            ? `Agent zakończył pracę. Zadanie: ${newestTask.action}`
+            : `Agent zakończył pracę dla ${clientName}.`,
+          "green"
+        );
+
+        await loadClients();
+      } catch (error) {
+        showMessage(
+          getFriendlyError(error),
+          "red"
+        );
+
+        console.error(error);
+      } finally {
+        agentButton.disabled = false;
+        agentButton.textContent =
+          "Uruchom agenta";
       }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error);
     }
 
-    const newestTask = result.tasks[0];
-
-    showMessage(
-      newestTask
-        ? `Agent zakończył pracę. Zadanie: ${newestTask.action}`
-        : "Agent zakończył pracę.",
-      "green"
-    );
-
-    await loadClients();
-  } catch (error) {
-    showMessage(
-      getFriendlyError(error),
-      "red"
-    );
-
-    console.error(error);
-  } finally {
-    agentButton.disabled = false;
-    agentButton.textContent = "Uruchom agenta";
-  }
-}
     async function loadClients() {
       try {
         const response = await fetch(
@@ -427,7 +449,8 @@ async function runAgent(
           const headerElement =
             document.createElement("div");
 
-          headerElement.className = "client-header";
+          headerElement.className =
+            "client-header";
 
           const nameElement =
             document.createElement("strong");
@@ -451,16 +474,30 @@ async function runAgent(
             document.createElement("span");
 
           priorityElement.className =
-            `badge ${getPriorityClass(client.priority)}`;
+            `badge ${getPriorityClass(
+              client.priority
+            )}`;
 
           priorityElement.textContent =
-            `Priorytet: ${client.priority || "ŚREDNI"}`;
+            `Priorytet: ${
+              client.priority || "ŚREDNI"
+            }`;
 
-          badgesElement.appendChild(statusElement);
-          badgesElement.appendChild(priorityElement);
+          badgesElement.appendChild(
+            statusElement
+          );
 
-          headerElement.appendChild(nameElement);
-          headerElement.appendChild(badgesElement);
+          badgesElement.appendChild(
+            priorityElement
+          );
+
+          headerElement.appendChild(
+            nameElement
+          );
+
+          headerElement.appendChild(
+            badgesElement
+          );
 
           const emailElement =
             document.createElement("p");
@@ -472,122 +509,194 @@ async function runAgent(
             document.createElement("p");
 
           noteElement.textContent =
-            `Notatka: ${client.note || "Brak"}`;
+            `Notatka: ${
+              client.note || "Brak"
+            }`;
 
           const aiInsightsElement =
-  document.createElement("div");
+            document.createElement("div");
 
-aiInsightsElement.className = "ai-insights";
+          aiInsightsElement.className =
+            "ai-insights";
 
-const summaryElement =
-  document.createElement("p");
+          const summaryElement =
+            document.createElement("p");
 
-const summaryLabel =
-  document.createElement("strong");
+          const summaryLabel =
+            document.createElement("strong");
 
-summaryLabel.className = "ai-label";
-summaryLabel.textContent = "AI Summary: ";
+          summaryLabel.className = "ai-label";
+          summaryLabel.textContent =
+            "AI Summary: ";
 
-summaryElement.appendChild(summaryLabel);
-summaryElement.append(
-  client.summary || "Brak analizy AI"
-);
+          summaryElement.appendChild(
+            summaryLabel
+          );
 
-const nextActionElement =
-  document.createElement("p");
+          summaryElement.append(
+            client.summary || "Brak analizy AI"
+          );
 
-const nextActionLabel =
-  document.createElement("strong");
+          const nextActionElement =
+            document.createElement("p");
 
-nextActionLabel.className = "ai-label";
-nextActionLabel.textContent = "Next action: ";
+          const nextActionLabel =
+            document.createElement("strong");
 
-nextActionElement.appendChild(nextActionLabel);
-nextActionElement.append(
-  client.next_action || "Brak rekomendowanego działania"
-);
+          nextActionLabel.className =
+            "ai-label";
 
-aiInsightsElement.appendChild(summaryElement);
-aiInsightsElement.appendChild(nextActionElement);  
-const agentTaskElement =
-  document.createElement("div");
+          nextActionLabel.textContent =
+            "Next action: ";
 
-agentTaskElement.className = "agent-task";
+          nextActionElement.appendChild(
+            nextActionLabel
+          );
 
-const latestAgentTask =
-  client.agent_tasks?.[0];
+          nextActionElement.append(
+            client.next_action ||
+            "Brak rekomendowanego działania"
+          );
 
-if (latestAgentTask) {
-  const agentTaskLabel =
-    document.createElement("strong");
+          aiInsightsElement.appendChild(
+            summaryElement
+          );
 
-  agentTaskLabel.className =
-    "agent-task-label";
+          aiInsightsElement.appendChild(
+            nextActionElement
+          );
 
-  agentTaskLabel.textContent =
-    "Zadanie agenta: ";
+          const agentTaskElement =
+            document.createElement("div");
 
-  agentTaskElement.appendChild(
-    agentTaskLabel
-  );
+          agentTaskElement.className =
+            "agent-task";
 
-  agentTaskElement.append(
-    latestAgentTask.action
-  );
-} else {
-  agentTaskElement.style.display = "none";
-}
+          const latestAgentTask =
+            client.agent_tasks?.[0];
+
+          if (latestAgentTask) {
+            const agentTaskLabel =
+              document.createElement("strong");
+
+            agentTaskLabel.className =
+              "agent-task-label";
+
+            agentTaskLabel.textContent =
+              "Zadanie agenta: ";
+
+            agentTaskElement.appendChild(
+              agentTaskLabel
+            );
+
+            agentTaskElement.append(
+              latestAgentTask.action
+            );
+          } else {
+            agentTaskElement.style.display =
+              "none";
+          }
+
           const actionsElement =
             document.createElement("div");
 
           actionsElement.className = "actions";
-const agentButton =
-  document.createElement("button");
 
-agentButton.type = "button";
-agentButton.className = "agent-button";
-agentButton.textContent = "Uruchom agenta";
+          const agentButton =
+            document.createElement("button");
 
-agentButton.addEventListener("click", () => {
-  runAgent(
-    client.id,
-    client.name,
-    agentButton
-  );
-});
+          agentButton.type = "button";
+          agentButton.className =
+            "agent-button";
+
+          agentButton.textContent =
+            "Uruchom agenta";
+
+          agentButton.addEventListener(
+            "click",
+            () => {
+              runAgent(
+                client.id,
+                client.name,
+                agentButton
+              );
+            }
+          );
+
           const editButton =
             document.createElement("button");
 
           editButton.type = "button";
-          editButton.className = "edit-button";
+          editButton.className =
+            "edit-button";
+
           editButton.textContent = "Edytuj";
 
-          editButton.addEventListener("click", () => {
-            startEditing(client);
-          });
+          editButton.addEventListener(
+            "click",
+            () => {
+              startEditing(client);
+            }
+          );
 
           const deleteButton =
             document.createElement("button");
 
           deleteButton.type = "button";
-          deleteButton.className = "delete-button";
+          deleteButton.className =
+            "delete-button";
+
           deleteButton.textContent = "Usuń";
 
-          deleteButton.addEventListener("click", () => {
-            deleteClient(client.id, client.name);
-          });
-actionsElement.appendChild(agentButton);
-          actionsElement.appendChild(editButton);
-          actionsElement.appendChild(deleteButton);
+          deleteButton.addEventListener(
+            "click",
+            () => {
+              deleteClient(
+                client.id,
+                client.name
+              );
+            }
+          );
 
-          clientElement.appendChild(headerElement);
-          clientElement.appendChild(emailElement);
-        clientElement.appendChild(noteElement);
-clientElement.appendChild(aiInsightsElement);
-clientElement.appendChild(agentTaskElement);
-clientElement.appendChild(actionsElement);
+          actionsElement.appendChild(
+            agentButton
+          );
 
-          clientsList.appendChild(clientElement);
+          actionsElement.appendChild(
+            editButton
+          );
+
+          actionsElement.appendChild(
+            deleteButton
+          );
+
+          clientElement.appendChild(
+            headerElement
+          );
+
+          clientElement.appendChild(
+            emailElement
+          );
+
+          clientElement.appendChild(
+            noteElement
+          );
+
+          clientElement.appendChild(
+            aiInsightsElement
+          );
+
+          clientElement.appendChild(
+            agentTaskElement
+          );
+
+          clientElement.appendChild(
+            actionsElement
+          );
+
+          clientsList.appendChild(
+            clientElement
+          );
         });
       } catch (error) {
         clientsList.textContent =
@@ -597,22 +706,31 @@ clientElement.appendChild(actionsElement);
       }
     }
 
-    clientForm.addEventListener("input", () => {
-      clearMessage();
-    });
+    clientForm.addEventListener(
+      "input",
+      () => {
+        clearMessage();
+      }
+    );
 
-    clientForm.addEventListener("change", () => {
-      clearMessage();
-    });
+    clientForm.addEventListener(
+      "change",
+      () => {
+        clearMessage();
+      }
+    );
 
-    cancelButton.addEventListener("click", () => {
-      resetForm();
+    cancelButton.addEventListener(
+      "click",
+      () => {
+        resetForm();
 
-      showMessage(
-        "Edycja została anulowana.",
-        "#475569"
-      );
-    });
+        showMessage(
+          "Edycja została anulowana.",
+          "#475569"
+        );
+      }
+    );
 
     clientForm.addEventListener(
       "submit",
@@ -621,16 +739,26 @@ clientElement.appendChild(actionsElement);
         clearMessage();
 
         const clientData = {
-          name: document.getElementById("name").value,
-          email: document.getElementById("email").value,
-          note: document.getElementById("note").value,
-          status: document.getElementById("status").value,
+          name:
+            document.getElementById("name").value,
+
+          email:
+            document.getElementById("email").value,
+
+          note:
+            document.getElementById("note").value,
+
+          status:
+            document.getElementById("status").value,
 
           priority:
-            document.getElementById("priority").value,
+            document.getElementById(
+              "priority"
+            ).value,
         };
 
-        const isEditing = editingClientId !== null;
+        const isEditing =
+          editingClientId !== null;
 
         const requestUrl = isEditing
           ? `${API_URL}/api/clients/${editingClientId}`
@@ -640,18 +768,29 @@ clientElement.appendChild(actionsElement);
           ? "PUT"
           : "POST";
 
+        submitButton.disabled = true;
+
+        submitButton.textContent = isEditing
+          ? "Zapisywanie..."
+          : "AI analizuje...";
+
         try {
-          const response = await fetch(requestUrl, {
-            method: requestMethod,
+          const response = await fetch(
+            requestUrl,
+            {
+              method: requestMethod,
 
-            headers: {
-              "Content-Type": "application/json",
-            },
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-            body: JSON.stringify(clientData),
-          });
+              body: JSON.stringify(clientData),
+            }
+          );
 
-          const result = await response.json();
+          const result =
+            await response.json();
 
           if (!response.ok) {
             throw new Error(result.error);
@@ -660,7 +799,7 @@ clientElement.appendChild(actionsElement);
           showMessage(
             isEditing
               ? "Zmiany klienta zostały zapisane!"
-              : "Klient został zapisany w bazie!",
+              : "Klient został zapisany wraz z analizą AI!",
             "green"
           );
 
@@ -674,6 +813,13 @@ clientElement.appendChild(actionsElement);
           );
 
           console.error(error);
+        } finally {
+          submitButton.disabled = false;
+
+          submitButton.textContent =
+            editingClientId === null
+              ? "Dodaj klienta"
+              : "Zapisz zmiany";
         }
       }
     );
