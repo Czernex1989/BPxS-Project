@@ -98,8 +98,22 @@ app.get("/db-test", async (req, res) => {
 app.get("/clients", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM clients ORDER BY id DESC"
-    );
+  `SELECT
+     clients.*,
+     COALESCE(
+       (
+         SELECT json_agg(
+           agent_tasks
+           ORDER BY agent_tasks.id DESC
+         )
+         FROM agent_tasks
+         WHERE agent_tasks.client_id = clients.id
+       ),
+       '[]'::json
+     ) AS agent_tasks
+   FROM clients
+   ORDER BY clients.id DESC`
+);
 
     res.json(result.rows);
   } catch (error) {

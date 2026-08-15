@@ -106,7 +106,21 @@
       padding: 7px 12px;
       margin: 0;
     }
+    .agent-task {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f5f3ff;
+  border-left: 4px solid #7c3aed;
+  border-radius: 6px;
+  line-height: 1.4;
+}
 
+.agent-task-label {
+  color: #6d28d9;
+}
+.agent-button {
+  background-color: #7c3aed;
+}
     .edit-button {
       background-color: #d97706;
     }
@@ -335,7 +349,52 @@
         console.error(error);
       }
     }
+async function runAgent(
+  clientId,
+  clientName,
+  agentButton
+) {
+  clearMessage();
 
+  agentButton.disabled = true;
+  agentButton.textContent = "Agent pracuje...";
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/clients/${clientId}/agent-run`,
+      {
+        method: "POST",
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error);
+    }
+
+    const newestTask = result.tasks[0];
+
+    showMessage(
+      newestTask
+        ? `Agent zakończył pracę. Zadanie: ${newestTask.action}`
+        : "Agent zakończył pracę.",
+      "green"
+    );
+
+    await loadClients();
+  } catch (error) {
+    showMessage(
+      getFriendlyError(error),
+      "red"
+    );
+
+    console.error(error);
+  } finally {
+    agentButton.disabled = false;
+    agentButton.textContent = "Uruchom agenta";
+  }
+}
     async function loadClients() {
       try {
         const response = await fetch(
@@ -450,12 +509,52 @@ nextActionElement.append(
 
 aiInsightsElement.appendChild(summaryElement);
 aiInsightsElement.appendChild(nextActionElement);  
+const agentTaskElement =
+  document.createElement("div");
 
+agentTaskElement.className = "agent-task";
+
+const latestAgentTask =
+  client.agent_tasks?.[0];
+
+if (latestAgentTask) {
+  const agentTaskLabel =
+    document.createElement("strong");
+
+  agentTaskLabel.className =
+    "agent-task-label";
+
+  agentTaskLabel.textContent =
+    "Zadanie agenta: ";
+
+  agentTaskElement.appendChild(
+    agentTaskLabel
+  );
+
+  agentTaskElement.append(
+    latestAgentTask.action
+  );
+} else {
+  agentTaskElement.style.display = "none";
+}
           const actionsElement =
             document.createElement("div");
 
           actionsElement.className = "actions";
+const agentButton =
+  document.createElement("button");
 
+agentButton.type = "button";
+agentButton.className = "agent-button";
+agentButton.textContent = "Uruchom agenta";
+
+agentButton.addEventListener("click", () => {
+  runAgent(
+    client.id,
+    client.name,
+    agentButton
+  );
+});
           const editButton =
             document.createElement("button");
 
@@ -477,7 +576,7 @@ aiInsightsElement.appendChild(nextActionElement);
           deleteButton.addEventListener("click", () => {
             deleteClient(client.id, client.name);
           });
-
+actionsElement.appendChild(agentButton);
           actionsElement.appendChild(editButton);
           actionsElement.appendChild(deleteButton);
 
@@ -485,6 +584,7 @@ aiInsightsElement.appendChild(nextActionElement);
           clientElement.appendChild(emailElement);
         clientElement.appendChild(noteElement);
 clientElement.appendChild(aiInsightsElement);
+clientElement.appendChild(agentTaskElement);
 clientElement.appendChild(actionsElement);
 
           clientsList.appendChild(clientElement);
