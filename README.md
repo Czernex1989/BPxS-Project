@@ -57,7 +57,72 @@ BPxS-Project/
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/customers` | Returns all customers |
-| POST | `/customers` | Creates a new customer |
-| PUT | `/customers/:id` | Updates an existing customer |
-| DELETE | `/customers/:id` | Deletes a customer |
+| GET | `/clients` | Returns all clients |
+| POST | `/api/clients` | Creates a new client |
+| PUT | `/api/clients/:id` | Updates an existing client |
+| DELETE | `/api/clients/:id` | Deletes a client |
+| GET | `/db-test` | Checks the PostgreSQL connection |
+
+## Running the Project Locally
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Czernex1989/BPxS-Project.git
+cd BPxS-Project
+```
+
+### 2. Install the backend dependencies
+
+```bash
+cd backend
+npm install
+```
+
+### 3. Configure PostgreSQL
+
+Create a `.env` file inside the `backend` directory:
+
+```env
+DB_USER=your_postgres_user
+DB_HOST=localhost
+DB_NAME=your_database_name
+DB_PASSWORD=your_postgres_password
+DB_PORT=5432
+```
+
+The `.env` file contains private database credentials and is not included in the repository.
+
+### 4. Start the application
+
+Run this command from the `backend` directory:
+
+```bash
+node server.js
+```
+
+Open the application in your browser:
+
+```text
+http://localhost:3000
+```
+
+### 5. Run the Playwright test
+
+Open another terminal in the main project directory:
+
+```bash
+npm install
+npx playwright test
+```
+
+## Testing
+
+The project includes:
+
+- Manual CRUD testing
+- PostgreSQL connection testing
+- REST API testing
+- Playwright end-to-end testing
+
+Detailed manual test cases are available in [Testing.md](Testing.md).
