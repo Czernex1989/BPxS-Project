@@ -2,1588 +2,794 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BPxS AI CRM</title>
-
   <style>
     :root {
-      --background: #07111f;
-      --background-soft: #0d192b;
-      --panel: rgba(16, 29, 49, 0.92);
-      --panel-light: rgba(24, 39, 65, 0.92);
-      --border: rgba(148, 163, 184, 0.16);
+      --bg: #07111f;
+      --panel: #101d31;
+      --panel-2: #14243c;
+      --field: #091627;
+      --border: rgba(148, 163, 184, 0.18);
       --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --blue: #3b82f6;
-      --blue-light: #60a5fa;
-      --purple: #8b5cf6;
-      --purple-light: #a78bfa;
-      --green: #22c55e;
-      --yellow: #f59e0b;
+      --muted: #94a3b8;
+      --blue: #4f8cff;
+      --purple: #845ef7;
+      --green: #2dd476;
+      --yellow: #f5a524;
       --red: #ef4444;
-      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      --shadow: 0 22px 55px rgba(0, 0, 0, 0.28);
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family:
-        Inter,
-        ui-sans-serif,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
       color: var(--text);
       background:
-        radial-gradient(
-          circle at 15% 10%,
-          rgba(59, 130, 246, 0.16),
-          transparent 32%
-        ),
-        radial-gradient(
-          circle at 90% 25%,
-          rgba(139, 92, 246, 0.13),
-          transparent 30%
-        ),
-        var(--background);
+        radial-gradient(circle at 12% 8%, rgba(79, 140, 255, 0.15), transparent 30%),
+        radial-gradient(circle at 88% 20%, rgba(132, 94, 247, 0.12), transparent 28%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    button,
-    input,
-    textarea,
-    select {
-      font: inherit;
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+
+    .auth-view {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
 
-    button {
-      cursor: pointer;
+    .auth-layout {
+      width: min(1040px, 100%);
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: rgba(16, 29, 49, 0.94);
+      box-shadow: var(--shadow);
     }
 
-    .page {
-      width: min(1500px, calc(100% - 40px));
-      margin: 0 auto;
-      padding-bottom: 60px;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      margin-bottom: 28px;
-      padding: 18px 0;
-      background: rgba(7, 17, 31, 0.78);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(18px);
-    }
-
-    .topbar-content {
-      width: min(1500px, calc(100% - 40px));
-      margin: 0 auto;
+    .auth-intro {
+      padding: 58px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
-      gap: 20px;
+      background:
+        linear-gradient(145deg, rgba(79, 140, 255, 0.18), rgba(132, 94, 247, 0.12)),
+        var(--panel);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-    }
-
+    .brand { display: flex; align-items: center; gap: 13px; }
     .brand-logo {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       display: grid;
       place-items: center;
       border-radius: 14px;
       font-size: 21px;
-      font-weight: 800;
-      color: white;
-      background:
-        linear-gradient(
-          135deg,
-          var(--blue),
-          var(--purple)
-        );
-      box-shadow: 0 10px 28px rgba(99, 102, 241, 0.32);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      box-shadow: 0 10px 26px rgba(93, 86, 235, 0.3);
     }
-
-    .brand-name {
-      margin: 0;
-      font-size: 20px;
-      line-height: 1.1;
-    }
-
-    .brand-description {
-      margin: 4px 0 0;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .system-status {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 9px 14px;
-      border: 1px solid rgba(34, 197, 94, 0.22);
-      border-radius: 999px;
-      font-size: 13px;
-      color: #bbf7d0;
-      background: rgba(34, 197, 94, 0.08);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 12px var(--green);
-    }
-
-    .hero {
-      margin-bottom: 26px;
-    }
-
-    .hero-eyebrow {
-      margin: 0 0 8px;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--purple-light);
-    }
-
-    .hero h1 {
-      margin: 0;
-      max-width: 800px;
-      font-size: clamp(30px, 4vw, 48px);
-      line-height: 1.08;
-      letter-spacing: -0.04em;
-    }
-
-    .hero h1 span {
+    .brand-title { margin: 0; font-size: 20px; }
+    .brand-copy { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .auth-intro h1 { max-width: 520px; margin: 70px 0 16px; font-size: clamp(34px, 5vw, 56px); line-height: 1.04; letter-spacing: -0.045em; }
+    .gradient-text {
       color: transparent;
-      background:
-        linear-gradient(
-          90deg,
-          var(--blue-light),
-          var(--purple-light)
-        );
+      background: linear-gradient(90deg, #75a7ff, #b199ff);
       background-clip: text;
       -webkit-background-clip: text;
     }
+    .auth-intro-text { max-width: 520px; margin: 0; color: #b6c3d5; line-height: 1.7; }
+    .security-note { margin-top: 70px; color: var(--muted); font-size: 13px; }
 
-    .hero-text {
-      max-width: 720px;
-      margin: 15px 0 0;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
+    .auth-card { padding: 48px; background: rgba(7, 17, 31, 0.42); }
+    .auth-card h2 { margin: 0; font-size: 28px; }
+    .auth-subtitle { margin: 8px 0 26px; color: var(--muted); line-height: 1.5; }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 24px; padding: 5px; border-radius: 13px; background: rgba(7, 17, 31, 0.72); }
+    .auth-tab { padding: 10px; border: 0; border-radius: 9px; color: var(--muted); background: transparent; font-weight: 750; }
+    .auth-tab.active { color: white; background: var(--panel-2); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      padding: 19px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--panel);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
-    }
-
-    .stat-label {
-      margin: 0 0 9px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .stat-value {
-      margin: 0;
-      font-size: 29px;
-      font-weight: 800;
-    }
-
-    .stat-accent-blue {
-      border-top: 2px solid var(--blue);
-    }
-
-    .stat-accent-red {
-      border-top: 2px solid var(--red);
-    }
-
-    .stat-accent-green {
-      border-top: 2px solid var(--green);
-    }
-
-    .stat-accent-purple {
-      border-top: 2px solid var(--purple);
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 390px minmax(0, 1fr);
-      gap: 22px;
-      align-items: start;
-    }
-
-    .panel {
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .form-panel {
-      position: sticky;
-      top: 105px;
-    }
-
-    .panel-header {
-      padding: 22px 22px 18px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .panel-title-row {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-    }
-
-    .panel-icon {
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-      border-radius: 11px;
-      font-weight: 800;
-      color: white;
-      background:
-        linear-gradient(
-          135deg,
-          var(--blue),
-          var(--purple)
-        );
-    }
-
-    .panel-title {
-      margin: 0;
-      font-size: 19px;
-    }
-
-    .panel-subtitle {
-      margin: 5px 0 0;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .form-content {
-      padding: 22px;
-    }
-
-    .form-group {
-      margin-bottom: 17px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 13px;
-      font-weight: 650;
-      color: #cbd5e1;
-    }
-
-    input,
-    textarea,
-    select {
+    .field-group { margin-bottom: 17px; }
+    label { display: block; margin-bottom: 7px; color: #cbd5e1; font-size: 13px; font-weight: 700; }
+    input, textarea, select {
       width: 100%;
       padding: 12px 13px;
-      color: var(--text);
-      border: 1px solid rgba(148, 163, 184, 0.22);
+      border: 1px solid rgba(148, 163, 184, 0.24);
       border-radius: 11px;
       outline: none;
-      background: rgba(7, 17, 31, 0.7);
-      transition:
-        border-color 0.2s,
-        box-shadow 0.2s,
-        transform 0.2s;
+      color: var(--text);
+      background: var(--field);
+      transition: border-color 0.18s, box-shadow 0.18s;
     }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
-    }
-
-    textarea {
-      min-height: 105px;
-      resize: vertical;
-    }
-
-    select option {
-      color: #0f172a;
-      background: white;
-    }
-
-    .primary-button,
-    .secondary-button {
-      width: 100%;
-      padding: 13px 16px;
-      border: none;
-      border-radius: 11px;
-      font-weight: 750;
-      color: white;
-      transition:
-        transform 0.2s,
-        opacity 0.2s,
-        box-shadow 0.2s;
-    }
-
-    .primary-button {
-      background:
-        linear-gradient(
-          135deg,
-          var(--blue),
-          var(--purple)
-        );
-      box-shadow: 0 12px 25px rgba(79, 70, 229, 0.25);
-    }
-
-    .secondary-button {
-      display: none;
-      margin-top: 10px;
-      color: #cbd5e1;
-      border: 1px solid var(--border);
-      background: rgba(100, 116, 139, 0.16);
-    }
-
-    .primary-button:hover:not(:disabled),
-    .secondary-button:hover:not(:disabled),
-    .action-button:hover:not(:disabled) {
-      transform: translateY(-1px);
-    }
-
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-    }
-
-    #message {
-      display: none;
-      margin: 0 22px 22px;
-      padding: 12px 14px;
-      border-radius: 11px;
-      font-size: 14px;
-      font-weight: 650;
-      line-height: 1.45;
-    }
-
-    #message.success {
-      display: block;
-      color: #bbf7d0;
-      border: 1px solid rgba(34, 197, 94, 0.24);
-      background: rgba(34, 197, 94, 0.1);
-    }
-
-    #message.error {
-      display: block;
-      color: #fecaca;
-      border: 1px solid rgba(239, 68, 68, 0.24);
-      background: rgba(239, 68, 68, 0.1);
-    }
-
-    #message.info {
-      display: block;
-      color: #cbd5e1;
-      border: 1px solid var(--border);
-      background: rgba(100, 116, 139, 0.12);
-    }
-
-    .clients-panel {
-      min-width: 0;
-    }
-
-    .clients-panel .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    .clients-counter {
-      padding: 7px 11px;
-      border-radius: 999px;
-      font-size: 12px;
-      color: #bfdbfe;
-      background: rgba(59, 130, 246, 0.12);
-    }
-
-    #clientsList {
-      display: grid;
-      gap: 15px;
-      padding: 20px;
-    }
-
-    .client-card {
-      position: relative;
-      padding: 20px;
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      background:
-        linear-gradient(
-          145deg,
-          rgba(24, 39, 65, 0.88),
-          rgba(13, 25, 43, 0.9)
-        );
-      transition:
-        transform 0.2s,
-        border-color 0.2s,
-        box-shadow 0.2s;
-      overflow: hidden;
-    }
-
-    .client-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 3px;
-      background:
-        linear-gradient(
-          180deg,
-          var(--blue),
-          var(--purple)
-        );
-    }
-
-    .client-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(96, 165, 250, 0.32);
-      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.2);
-    }
-
-    .client-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-
-    .client-name {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.3;
-    }
-
-    .client-email {
-      display: inline-block;
-      margin-top: 6px;
-      color: var(--text-muted);
-      font-size: 13px;
-      text-decoration: none;
-    }
-
-    .client-email:hover {
-      color: var(--blue-light);
-    }
-
-    .badges {
-      display: flex;
-      justify-content: flex-end;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 9px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-    }
-
-    .status-badge {
-      color: #bfdbfe;
-      background: rgba(59, 130, 246, 0.14);
-    }
-
-    .priority-high {
-      color: #fecaca;
-      background: rgba(239, 68, 68, 0.14);
-    }
-
-    .priority-medium {
-      color: #fde68a;
-      background: rgba(245, 158, 11, 0.14);
-    }
-
-    .priority-low {
-      color: #bbf7d0;
-      background: rgba(34, 197, 94, 0.14);
-    }
-
-    .note-box {
-      margin-bottom: 14px;
-      padding: 13px 14px;
-      border-radius: 11px;
-      color: #cbd5e1;
-      background: rgba(7, 17, 31, 0.42);
-      line-height: 1.5;
-    }
-
-    .section-label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .ai-box {
-      margin-bottom: 14px;
-      padding: 15px;
-      border: 1px solid rgba(139, 92, 246, 0.24);
-      border-radius: 13px;
-      background:
-        linear-gradient(
-          135deg,
-          rgba(59, 130, 246, 0.08),
-          rgba(139, 92, 246, 0.1)
-        );
-    }
-
-    .ai-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0 0 10px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #c4b5fd;
-    }
-
-    .ai-content {
-      margin: 0;
-      color: #e2e8f0;
-      line-height: 1.55;
-    }
-
-    .next-action {
-      margin-top: 11px;
-      padding-top: 11px;
-      border-top: 1px solid rgba(148, 163, 184, 0.12);
-    }
-
-    .agent-task {
-      margin-bottom: 15px;
-      padding: 14px;
-      border-left: 3px solid var(--purple);
+    input:focus, textarea:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.14); }
+    textarea { min-height: 108px; resize: vertical; }
+    select option { color: #111827; background: white; }
+    .button-primary, .button-secondary, .action-button, .logout-button {
+      border: 0;
       border-radius: 10px;
-      color: #ddd6fe;
-      background: rgba(139, 92, 246, 0.09);
-      line-height: 1.5;
-    }
-
-    .task-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 7px;
-    }
-
-    .task-title {
-      font-size: 12px;
       font-weight: 800;
-      color: var(--purple-light);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      transition: transform 0.18s, opacity 0.18s, filter 0.18s;
     }
+    .button-primary:hover:not(:disabled), .button-secondary:hover:not(:disabled), .action-button:hover:not(:disabled), .logout-button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
+    .button-primary { width: 100%; padding: 13px 16px; color: white; background: linear-gradient(135deg, var(--blue), var(--purple)); box-shadow: 0 12px 24px rgba(79, 70, 229, 0.22); }
+    .button-secondary { width: 100%; margin-top: 10px; padding: 12px 16px; color: #d8e0eb; border: 1px solid var(--border); background: rgba(100, 116, 139, 0.12); }
+    .form-message { display: none; margin-top: 15px; padding: 11px 13px; border-radius: 10px; font-size: 13px; font-weight: 650; line-height: 1.45; }
+    .form-message.success { display: block; color: #bbf7d0; border: 1px solid rgba(45, 212, 118, 0.25); background: rgba(45, 212, 118, 0.1); }
+    .form-message.error { display: block; color: #fecaca; border: 1px solid rgba(239, 68, 68, 0.25); background: rgba(239, 68, 68, 0.1); }
+    .form-message.info { display: block; color: #dbeafe; border: 1px solid var(--border); background: rgba(79, 140, 255, 0.08); }
 
-    .task-status {
-      padding: 4px 7px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 800;
-      color: #fde68a;
-      background: rgba(245, 158, 11, 0.13);
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 17, 31, 0.85);
+      backdrop-filter: blur(18px);
     }
+    .topbar-inner { width: min(1480px, calc(100% - 40px)); min-height: 78px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .user-area { display: flex; align-items: center; gap: 12px; }
+    .user-avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: white; background: linear-gradient(135deg, var(--blue), var(--purple)); font-weight: 900; }
+    .user-name { margin: 0; font-size: 13px; font-weight: 800; }
+    .user-email { margin: 2px 0 0; color: var(--muted); font-size: 11px; }
+    .logout-button { padding: 9px 12px; color: #d8e0eb; border: 1px solid var(--border); background: rgba(100, 116, 139, 0.11); }
 
-    .task-text {
-      margin: 0;
-    }
+    .page { width: min(1480px, calc(100% - 40px)); margin: 0 auto; padding: 34px 0 60px; }
+    .hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; margin-bottom: 24px; }
+    .eyebrow { margin: 0 0 8px; color: #ae92ff; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+    .hero h1 { margin: 0; font-size: clamp(28px, 3vw, 42px); letter-spacing: -0.04em; }
+    .hero-copy { margin: 10px 0 0; color: var(--muted); }
+    .system-status { display: flex; align-items: center; gap: 8px; padding: 9px 13px; border: 1px solid rgba(45, 212, 118, 0.24); border-radius: 999px; color: #bbf7d0; background: rgba(45, 212, 118, 0.08); font-size: 12px; white-space: nowrap; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); }
 
-    .actions {
-      display: flex;
-      gap: 9px;
-      flex-wrap: wrap;
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 20px; }
+    .stat-card { padding: 17px 18px; border: 1px solid var(--border); border-radius: 16px; background: rgba(16, 29, 49, 0.9); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.13); }
+    .stat-blue { border-top: 2px solid var(--blue); }
+    .stat-red { border-top: 2px solid var(--red); }
+    .stat-green { border-top: 2px solid var(--green); }
+    .stat-purple { border-top: 2px solid var(--purple); }
+    .stat-label { margin: 0 0 8px; color: var(--muted); font-size: 12px; }
+    .stat-value { margin: 0; font-size: 27px; font-weight: 900; }
 
-    .action-button {
-      padding: 9px 12px;
-      border: none;
-      border-radius: 9px;
-      font-size: 12px;
-      font-weight: 750;
-      color: white;
-      transition:
-        transform 0.2s,
-        opacity 0.2s;
-    }
+    .workspace { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 20px; align-items: start; }
+    .panel { overflow: hidden; border: 1px solid var(--border); border-radius: 20px; background: rgba(16, 29, 49, 0.92); box-shadow: var(--shadow); }
+    .form-panel { position: sticky; top: 98px; }
+    .panel-header { min-height: 78px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--border); }
+    .panel-heading { display: flex; align-items: center; gap: 11px; }
+    .panel-icon { width: 37px; height: 37px; display: grid; place-items: center; flex-shrink: 0; border-radius: 11px; background: linear-gradient(135deg, var(--blue), var(--purple)); font-weight: 900; }
+    .panel-title { margin: 0; font-size: 18px; }
+    .panel-copy { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .form-content { padding: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    #message { margin: 0 20px 20px; }
 
-    .agent-button {
-      background:
-        linear-gradient(
-          135deg,
-          #7c3aed,
-          #9333ea
-        );
-    }
+    .toolbar { padding: 16px 20px; display: grid; grid-template-columns: minmax(210px, 1fr) 170px 170px; gap: 10px; border-bottom: 1px solid var(--border); background: rgba(7, 17, 31, 0.25); }
+    .search-wrap { position: relative; }
+    .search-wrap input { padding-left: 39px; }
+    .search-icon { position: absolute; top: 50%; left: 14px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .clients-counter { padding: 6px 10px; border-radius: 999px; color: #bfdbfe; background: rgba(79, 140, 255, 0.12); font-size: 11px; white-space: nowrap; }
+    .filter-result { display: none; padding: 11px 20px; color: var(--muted); border-bottom: 1px solid var(--border); background: rgba(7, 17, 31, 0.2); font-size: 12px; }
+    #clientsList { display: grid; gap: 13px; padding: 18px; }
 
-    .edit-button {
-      background: #c76c08;
-    }
-
-    .delete-button {
-      background: #dc2626;
-    }
-
-    .empty-state,
-    .loading-state {
-      padding: 44px 20px;
-      text-align: center;
-      color: var(--text-muted);
-    }
-
-    .empty-icon {
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      margin: 0 auto 12px;
-      border-radius: 15px;
-      font-size: 21px;
-      color: var(--blue-light);
-      background: rgba(59, 130, 246, 0.1);
-    }
+    .client { position: relative; overflow: hidden; padding: 18px; border: 1px solid var(--border); border-radius: 15px; background: linear-gradient(145deg, rgba(24, 39, 65, 0.9), rgba(13, 25, 43, 0.92)); transition: transform 0.18s, border-color 0.18s; }
+    .client::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(180deg, var(--blue), var(--purple)); }
+    .client:hover { transform: translateY(-1px); border-color: rgba(117, 167, 255, 0.32); }
+    .client-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 13px; }
+    .client-name { margin: 0; font-size: 17px; }
+    .client-email { display: inline-block; margin-top: 5px; color: var(--muted); font-size: 12px; text-decoration: none; }
+    .client-email:hover { color: #8ab4ff; }
+    .badges { display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+    .badge { padding: 5px 8px; border-radius: 999px; font-size: 10px; font-weight: 900; white-space: nowrap; }
+    .status-badge { color: #bfdbfe; background: rgba(79, 140, 255, 0.14); }
+    .priority-high { color: #fecaca; background: rgba(239, 68, 68, 0.14); }
+    .priority-medium { color: #fde68a; background: rgba(245, 165, 36, 0.14); }
+    .priority-low { color: #bbf7d0; background: rgba(45, 212, 118, 0.14); }
+    .note-box { padding: 11px 13px; border-radius: 10px; color: #cad5e3; background: rgba(7, 17, 31, 0.46); line-height: 1.5; font-size: 13px; }
+    .section-label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+    .details-toggle { margin-top: 11px; padding: 7px 0; border: 0; color: #b9a8ff; background: transparent; font-size: 12px; font-weight: 800; }
+    .client-details { display: none; margin-top: 6px; }
+    .client-details.open { display: block; }
+    .ai-box { padding: 13px; border: 1px solid rgba(132, 94, 247, 0.24); border-radius: 11px; background: linear-gradient(135deg, rgba(79, 140, 255, 0.08), rgba(132, 94, 247, 0.1)); }
+    .ai-title { margin: 0 0 8px; color: #c4b5fd; font-size: 12px; font-weight: 900; }
+    .ai-content { margin: 0; color: #e2e8f0; line-height: 1.52; font-size: 13px; }
+    .next-action { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(148, 163, 184, 0.13); line-height: 1.5; font-size: 13px; }
+    .agent-task { margin-top: 10px; padding: 12px; border-left: 3px solid var(--purple); border-radius: 9px; color: #ddd6fe; background: rgba(132, 94, 247, 0.1); line-height: 1.5; font-size: 13px; }
+    .task-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .task-title { color: #bba7ff; font-size: 10px; font-weight: 900; letter-spacing: 0.07em; text-transform: uppercase; }
+    .task-status { padding: 3px 6px; border-radius: 999px; color: #fde68a; background: rgba(245, 165, 36, 0.14); font-size: 9px; font-weight: 900; }
+    .task-text { margin: 0; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 13px; }
+    .action-button { padding: 8px 11px; color: white; font-size: 11px; }
+    .agent-button { background: linear-gradient(135deg, #7c3aed, #9333ea); }
+    .edit-button { background: #bd6508; }
+    .delete-button { background: #dc2626; }
+    .empty-state, .loading-state { padding: 45px 20px; text-align: center; color: var(--muted); }
+    .empty-icon { width: 45px; height: 45px; display: grid; place-items: center; margin: 0 auto 11px; border-radius: 14px; color: #8ab4ff; background: rgba(79, 140, 255, 0.1); font-size: 20px; }
+    .empty-state p { margin-bottom: 0; }
 
     @media (max-width: 1050px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-panel {
-        position: static;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+      .workspace { grid-template-columns: 1fr; }
+      .form-panel { position: static; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .search-wrap { grid-column: 1 / -1; }
     }
-
-    @media (max-width: 650px) {
-      .page,
-      .topbar-content {
-        width: min(100% - 24px, 1500px);
-      }
-
-      .topbar {
-        padding: 12px 0;
-      }
-
-      .system-status {
-        display: none;
-      }
-
-      .hero {
-        margin-top: 22px;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-
-      .stat-card {
-        padding: 15px;
-      }
-
-      .stat-value {
-        font-size: 24px;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-
-      .client-header {
-        flex-direction: column;
-      }
-
-      .badges {
-        justify-content: flex-start;
-      }
-
-      .clients-panel .panel-header {
-        align-items: flex-start;
-      }
+    @media (max-width: 760px) {
+      .auth-layout { grid-template-columns: 1fr; }
+      .auth-intro { display: none; }
+      .auth-card { padding: 30px 24px; }
+      .page, .topbar-inner { width: min(100% - 24px, 1480px); }
+      .user-email { display: none; }
+      .hero { align-items: flex-start; }
+      .system-status { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .stat-card { padding: 14px; }
+      .toolbar { grid-template-columns: 1fr; }
+      .search-wrap { grid-column: auto; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .client-header { flex-direction: column; }
+      .badges { justify-content: flex-start; }
     }
   </style>
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="topbar-content">
-      <div class="brand">
-        <div class="brand-logo">B</div>
-
+  <section id="authView" class="auth-view">
+    <div class="auth-layout">
+      <div class="auth-intro">
         <div>
-          <h2 class="brand-name">BPxS CRM</h2>
-          <p class="brand-description">
-            Inteligentna obsługa klientów
-          </p>
+          <div class="brand">
+            <div class="brand-logo">B</div>
+            <div>
+              <h2 class="brand-title">BPxS CRM</h2>
+              <p class="brand-copy">Bezpieczna obsługa klientów z AI</p>
+            </div>
+          </div>
+          <h1>Twój własny <span class="gradient-text">AI workspace</span></h1>
+          <p class="auth-intro-text">Każdy użytkownik ma oddzielną listę klientów. Agent widzi i obsługuje wyłącznie dane należące do zalogowanego konta.</p>
         </div>
+        <p class="security-note">🔒 Hasła są hashowane, a sesja przechowywana w ciasteczku HTTP-only.</p>
       </div>
 
-      <div class="system-status">
-        <span class="status-dot"></span>
-        System aktywny
+      <div class="auth-card">
+        <h2 id="authTitle">Witaj ponownie</h2>
+        <p id="authSubtitle" class="auth-subtitle">Zaloguj się, aby przejść do swojego CRM-u.</p>
+
+        <div class="auth-tabs">
+          <button id="loginTab" class="auth-tab active" type="button">Logowanie</button>
+          <button id="registerTab" class="auth-tab" type="button">Rejestracja</button>
+        </div>
+
+        <form id="authForm">
+          <div id="authNameGroup" class="field-group hidden">
+            <label for="authName">Imię:</label>
+            <input id="authName" type="text" maxlength="100" autocomplete="name" placeholder="np. Artur">
+          </div>
+          <div class="field-group">
+            <label for="authEmail">E-mail:</label>
+            <input id="authEmail" type="email" maxlength="255" autocomplete="email" placeholder="twoj@email.pl" required>
+          </div>
+          <div class="field-group">
+            <label for="authPassword">Hasło:</label>
+            <input id="authPassword" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="Minimum 8 znaków" required>
+          </div>
+          <button id="authSubmit" class="button-primary" type="submit">Zaloguj się</button>
+          <div id="authMessage" class="form-message"></div>
+        </form>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main class="page">
-    <section class="hero">
-      <p class="hero-eyebrow">AI-powered workspace</p>
-
-      <h1>
-        Zarządzaj klientami z pomocą
-        <span>agenta AI</span>
-      </h1>
-
-      <p class="hero-text">
-        Klienci, analiza AI, rekomendowane działania i zadania
-        agenta w jednym miejscu.
-      </p>
-    </section>
-
-    <section class="stats-grid">
-      <article class="stat-card stat-accent-blue">
-        <p class="stat-label">Wszyscy klienci</p>
-        <p id="totalClients" class="stat-value">0</p>
-      </article>
-
-      <article class="stat-card stat-accent-red">
-        <p class="stat-label">Wysoki priorytet</p>
-        <p id="highPriorityClients" class="stat-value">0</p>
-      </article>
-
-      <article class="stat-card stat-accent-green">
-        <p class="stat-label">Status kontakt</p>
-        <p id="contactClients" class="stat-value">0</p>
-      </article>
-
-      <article class="stat-card stat-accent-purple">
-        <p class="stat-label">Zadania agentów</p>
-        <p id="agentTasksCount" class="stat-value">0</p>
-      </article>
-    </section>
-
-    <section class="dashboard-grid">
-      <aside class="panel form-panel">
-        <div class="panel-header">
-          <div class="panel-title-row">
-            <div class="panel-icon">+</div>
-
-            <div>
-              <h2 id="formTitle" class="panel-title">
-                Dodaj klienta
-              </h2>
-
-              <p class="panel-subtitle">
-                AI przeanalizuje zapisane informacje
-              </p>
-            </div>
+  <div id="appView" class="hidden">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-logo">B</div>
+          <div>
+            <h2 class="brand-title">BPxS CRM</h2>
+            <p class="brand-copy">Inteligentna obsługa klientów</p>
           </div>
         </div>
-
-        <form id="clientForm" class="form-content">
-          <div class="form-group">
-            <label for="name">Nazwa firmy</label>
-            <input
-              id="name"
-              type="text"
-              placeholder="np. Nova Dental"
-              required
-            >
+        <div class="user-area">
+          <div id="userAvatar" class="user-avatar">U</div>
+          <div>
+            <p id="userName" class="user-name">Użytkownik</p>
+            <p id="userEmail" class="user-email"></p>
           </div>
-
-          <div class="form-group">
-            <label for="email">Adres e-mail</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="kontakt@firma.pl"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label for="note">Notatka o kliencie</label>
-            <textarea
-              id="note"
-              placeholder="Opisz potrzeby klienta..."
-            ></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="status">Status</label>
-
-              <select id="status">
-                <option value="NOWY">Nowy</option>
-                <option value="KONTAKT">Kontakt</option>
-
-                <option value="ZAINTERESOWANY">
-                  Zainteresowany
-                </option>
-
-                <option value="ZAMKNIĘTY">
-                  Zamknięty
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="priority">Priorytet</label>
-
-              <select id="priority">
-                <option value="NISKI">Niski</option>
-
-                <option value="ŚREDNI" selected>
-                  Średni
-                </option>
-
-                <option value="WYSOKI">Wysoki</option>
-              </select>
-            </div>
-          </div>
-
-          <button
-            id="submitButton"
-            class="primary-button"
-            type="submit"
-          >
-            Dodaj klienta
-          </button>
-
-          <button
-            id="cancelButton"
-            class="secondary-button"
-            type="button"
-          >
-            Anuluj edycję
-          </button>
-        </form>
-
-        <div id="message"></div>
-      </aside>
-
-      <section class="panel clients-panel">
-        <div class="panel-header">
-          <div class="panel-title-row">
-            <div class="panel-icon">◎</div>
-
-            <div>
-              <h2 class="panel-title">Lista klientów</h2>
-
-              <p class="panel-subtitle">
-                Dane pobierane z PostgreSQL
-              </p>
-            </div>
-          </div>
-
-          <span id="clientsCounter" class="clients-counter">
-            0 klientów
-          </span>
+          <button id="logoutButton" class="logout-button" type="button">Wyloguj</button>
         </div>
+      </div>
+    </header>
 
-        <div id="clientsList">
-          <div class="loading-state">
-            Pobieranie klientów...
-          </div>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">AI-powered workspace</p>
+          <h1>Dzień dobry, <span id="heroUserName" class="gradient-text">Użytkowniku</span></h1>
+          <p class="hero-copy">Klienci, priorytety, analiza AI i zadania agenta w jednym miejscu.</p>
         </div>
+        <div class="system-status"><span class="status-dot"></span> System aktywny</div>
       </section>
-    </section>
-  </main>
+
+      <section class="stats-grid">
+        <article class="stat-card stat-blue"><p class="stat-label">Wszyscy klienci</p><p id="totalClients" class="stat-value">0</p></article>
+        <article class="stat-card stat-red"><p class="stat-label">Wysoki priorytet</p><p id="highPriorityClients" class="stat-value">0</p></article>
+        <article class="stat-card stat-green"><p class="stat-label">Do kontaktu</p><p id="contactClients" class="stat-value">0</p></article>
+        <article class="stat-card stat-purple"><p class="stat-label">Zadania agentów</p><p id="agentTasksCount" class="stat-value">0</p></article>
+      </section>
+
+      <section class="workspace">
+        <aside class="panel form-panel">
+          <div class="panel-header">
+            <div class="panel-heading">
+              <div class="panel-icon">+</div>
+              <div>
+                <h2 id="formTitle" class="panel-title">Dodaj klienta</h2>
+                <p class="panel-copy">AI przygotuje analizę i następny krok</p>
+              </div>
+            </div>
+          </div>
+
+          <form id="clientForm" class="form-content">
+            <div class="field-group">
+              <label for="name">Nazwa firmy:</label>
+              <input id="name" type="text" maxlength="120" placeholder="np. Nova Dental" required>
+            </div>
+            <div class="field-group">
+              <label for="email">Email:</label>
+              <input id="email" type="email" maxlength="255" placeholder="kontakt@firma.pl" required>
+            </div>
+            <div class="field-group">
+              <label for="note">Notatka:</label>
+              <textarea id="note" maxlength="1500" placeholder="Opisz potrzeby klienta..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="field-group">
+                <label for="status">Status:</label>
+                <select id="status">
+                  <option value="NOWY">Nowy</option>
+                  <option value="KONTAKT">Kontakt</option>
+                  <option value="ZAINTERESOWANY">Zainteresowany</option>
+                  <option value="ZAMKNIĘTY">Zamknięty</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="priority">Priorytet:</label>
+                <select id="priority">
+                  <option value="NISKI">Niski</option>
+                  <option value="ŚREDNI" selected>Średni</option>
+                  <option value="WYSOKI">Wysoki</option>
+                </select>
+              </div>
+            </div>
+            <button id="submitButton" class="button-primary" type="submit">Dodaj klienta</button>
+            <button id="cancelButton" class="button-secondary hidden" type="button">Anuluj edycję</button>
+          </form>
+          <div id="message" class="form-message"></div>
+        </aside>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-heading">
+              <div class="panel-icon">◎</div>
+              <div>
+                <h2 class="panel-title">Twoi klienci</h2>
+                <p class="panel-copy">Dane widoczne tylko dla Twojego konta</p>
+              </div>
+            </div>
+            <span id="clientsCounter" class="clients-counter">0 klientów</span>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="search-icon">⌕</span>
+              <input id="clientSearch" type="search" placeholder="Szukaj firmy, e-maila lub notatki..." aria-label="Szukaj klientów">
+            </div>
+            <select id="statusFilter" aria-label="Filtruj według statusu">
+              <option value="ALL">Wszystkie statusy</option>
+              <option value="NOWY">Nowy</option>
+              <option value="KONTAKT">Kontakt</option>
+              <option value="ZAINTERESOWANY">Zainteresowany</option>
+              <option value="ZAMKNIĘTY">Zamknięty</option>
+            </select>
+            <select id="priorityFilter" aria-label="Filtruj według priorytetu">
+              <option value="ALL">Wszystkie priorytety</option>
+              <option value="NISKI">Niski priorytet</option>
+              <option value="ŚREDNI">Średni priorytet</option>
+              <option value="WYSOKI">Wysoki priorytet</option>
+            </select>
+          </div>
+          <div id="filterResult" class="filter-result"></div>
+          <div id="clientsList"><div class="loading-state">Pobieranie klientów...</div></div>
+        </section>
+      </section>
+    </main>
+  </div>
 
   <script>
     const API_URL = window.location.origin;
-
+    let authMode = "login";
+    let currentUser = null;
     let editingClientId = null;
+    let allClients = [];
 
-    const clientForm =
-      document.getElementById("clientForm");
+    const authView = document.getElementById("authView");
+    const appView = document.getElementById("appView");
+    const authForm = document.getElementById("authForm");
+    const authNameGroup = document.getElementById("authNameGroup");
+    const authName = document.getElementById("authName");
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    const authSubmit = document.getElementById("authSubmit");
+    const authMessage = document.getElementById("authMessage");
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const clientForm = document.getElementById("clientForm");
+    const submitButton = document.getElementById("submitButton");
+    const cancelButton = document.getElementById("cancelButton");
+    const message = document.getElementById("message");
+    const clientsList = document.getElementById("clientsList");
+    const clientSearch = document.getElementById("clientSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const priorityFilter = document.getElementById("priorityFilter");
+    const filterResult = document.getElementById("filterResult");
 
-    const formTitle =
-      document.getElementById("formTitle");
-
-    const submitButton =
-      document.getElementById("submitButton");
-
-    const cancelButton =
-      document.getElementById("cancelButton");
-
-    const message =
-      document.getElementById("message");
-
-    const clientsList =
-      document.getElementById("clientsList");
-
-    const clientsCounter =
-      document.getElementById("clientsCounter");
-
-    function clearMessage() {
-      message.textContent = "";
-      message.className = "";
+    function setMessage(element, text, type = "info") {
+      element.textContent = text;
+      element.className = text ? `form-message ${type}` : "form-message";
     }
 
-    function showMessage(text, type = "info") {
-      message.textContent = text;
-      message.className = type;
+    function friendlyError(error) {
+      if (error.message === "Failed to fetch" || error.message.toLowerCase().includes("fetch")) return "Nie udało się połączyć z backendem.";
+      return error.message || "Wystąpił nieoczekiwany błąd.";
     }
 
-    function getFriendlyError(error) {
-      if (
-        error.message === "Failed to fetch" ||
-        error.message.toLowerCase().includes("fetch")
-      ) {
-        return "Nie udało się połączyć z backendem.";
+    async function apiFetch(path, options = {}) {
+      const response = await fetch(`${API_URL}${path}`, {
+        credentials: "include",
+        ...options,
+        headers: {
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(options.headers || {}),
+        },
+      });
+      let data = {};
+      try { data = await response.json(); } catch (error) { data = {}; }
+      if (!response.ok) {
+        if (response.status === 401 && !path.startsWith("/api/auth/")) showAuth();
+        throw new Error(data.error || "Operacja nie powiodła się.");
       }
-
-      return (
-        error.message ||
-        "Wystąpił nieoczekiwany błąd."
-      );
+      return data;
     }
 
-    function getPriorityClass(priority) {
-      if (priority === "WYSOKI") {
-        return "priority-high";
-      }
-
-      if (priority === "NISKI") {
-        return "priority-low";
-      }
-
-      return "priority-medium";
+    function setAuthMode(mode) {
+      authMode = mode;
+      const isRegister = mode === "register";
+      loginTab.classList.toggle("active", !isRegister);
+      registerTab.classList.toggle("active", isRegister);
+      authNameGroup.classList.toggle("hidden", !isRegister);
+      authName.required = isRegister;
+      authPassword.autocomplete = isRegister ? "new-password" : "current-password";
+      document.getElementById("authTitle").textContent = isRegister ? "Utwórz konto" : "Witaj ponownie";
+      document.getElementById("authSubtitle").textContent = isRegister ? "Twoi klienci będą oddzieleni od danych innych użytkowników." : "Zaloguj się, aby przejść do swojego CRM-u.";
+      authSubmit.textContent = isRegister ? "Utwórz konto" : "Zaloguj się";
+      setMessage(authMessage, "");
     }
 
-    function resetForm() {
+    function showAuth() {
+      currentUser = null;
+      appView.classList.add("hidden");
+      authView.classList.remove("hidden");
+    }
+
+    function showApp(user) {
+      currentUser = user;
+      authView.classList.add("hidden");
+      appView.classList.remove("hidden");
+      document.getElementById("userName").textContent = user.name;
+      document.getElementById("userEmail").textContent = user.email;
+      document.getElementById("userAvatar").textContent = user.name.charAt(0).toUpperCase();
+      document.getElementById("heroUserName").textContent = user.name;
+    }
+
+    async function checkSession() {
+      try {
+        const result = await apiFetch("/api/auth/me");
+        showApp(result.user);
+        await loadClients();
+      } catch (error) {
+        showAuth();
+      }
+    }
+
+    authForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage(authMessage, "");
+      authSubmit.disabled = true;
+      authSubmit.textContent = authMode === "register" ? "Tworzenie konta..." : "Logowanie...";
+      const payload = { email: authEmail.value.trim(), password: authPassword.value };
+      if (authMode === "register") payload.name = authName.value.trim();
+      try {
+        const result = await apiFetch(`/api/auth/${authMode}`, { method: "POST", body: JSON.stringify(payload) });
+        authForm.reset();
+        showApp(result.user);
+        await loadClients();
+      } catch (error) {
+        setMessage(authMessage, friendlyError(error), "error");
+      } finally {
+        authSubmit.disabled = false;
+        authSubmit.textContent = authMode === "register" ? "Utwórz konto" : "Zaloguj się";
+      }
+    });
+
+    loginTab.addEventListener("click", () => setAuthMode("login"));
+    registerTab.addEventListener("click", () => setAuthMode("register"));
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      try { await apiFetch("/api/auth/logout", { method: "POST" }); } finally {
+        allClients = [];
+        resetClientForm();
+        showAuth();
+        setAuthMode("login");
+      }
+    });
+
+    function resetClientForm() {
       editingClientId = null;
       clientForm.reset();
-
-      formTitle.textContent = "Dodaj klienta";
+      document.getElementById("formTitle").textContent = "Dodaj klienta";
       submitButton.textContent = "Dodaj klienta";
       submitButton.disabled = false;
-
-      cancelButton.style.display = "none";
+      cancelButton.classList.add("hidden");
     }
 
     function startEditing(client) {
-      clearMessage();
-
+      setMessage(message, "");
       editingClientId = client.id;
-
-      document.getElementById("name").value =
-        client.name;
-
-      document.getElementById("email").value =
-        client.email;
-
-      document.getElementById("note").value =
-        client.note || "";
-
-      document.getElementById("status").value =
-        client.status || "NOWY";
-
-      document.getElementById("priority").value =
-        client.priority || "ŚREDNI";
-
-      formTitle.textContent =
-        `Edytuj: ${client.name}`;
-
+      document.getElementById("name").value = client.name;
+      document.getElementById("email").value = client.email;
+      document.getElementById("note").value = client.note || "";
+      document.getElementById("status").value = client.status || "NOWY";
+      document.getElementById("priority").value = client.priority || "ŚREDNI";
+      document.getElementById("formTitle").textContent = `Edytuj: ${client.name}`;
       submitButton.textContent = "Zapisz zmiany";
-      cancelButton.style.display = "block";
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+      cancelButton.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    async function deleteClient(clientId, clientName) {
-      clearMessage();
+    function priorityClass(priority) {
+      if (priority === "WYSOKI") return "priority-high";
+      if (priority === "NISKI") return "priority-low";
+      return "priority-medium";
+    }
 
-      const confirmed = confirm(
-        `Czy na pewno usunąć klienta ${clientName}?`
-      );
+    function badge(text, className) {
+      const item = document.createElement("span");
+      item.className = `badge ${className}`;
+      item.textContent = text;
+      return item;
+    }
 
-      if (!confirmed) {
-        return;
-      }
-
+    async function deleteClient(client) {
+      if (!confirm(`Czy na pewno usunąć klienta ${client.name}?`)) return;
       try {
-        const response = await fetch(
-          `${API_URL}/api/clients/${clientId}`,
-          {
-            method: "DELETE",
-          }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            result.error || "Nie udało się usunąć klienta."
-          );
-        }
-
-        if (editingClientId === clientId) {
-          resetForm();
-        }
-
-        showMessage(
-          `Klient ${clientName} został usunięty.`,
-          "success"
-        );
-
+        await apiFetch(`/api/clients/${client.id}`, { method: "DELETE" });
+        if (editingClientId === client.id) resetClientForm();
+        setMessage(message, `Klient ${client.name} został usunięty.`, "success");
         await loadClients();
       } catch (error) {
-        showMessage(
-          getFriendlyError(error),
-          "error"
-        );
-
-        console.error(error);
+        setMessage(message, friendlyError(error), "error");
       }
     }
 
-    async function runAgent(
-      clientId,
-      clientName,
-      button
-    ) {
-      clearMessage();
-
+    async function runAgent(client, button) {
       const originalText = button.textContent;
-
       button.disabled = true;
       button.textContent = "Agent pracuje...";
-
+      setMessage(message, "");
       try {
-        const response = await fetch(
-          `${API_URL}/api/clients/${clientId}/agent-run`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            result.error ||
-            "Nie udało się uruchomić agenta."
-          );
-        }
-
-        const latestTask =
-          result.tasks &&
-          result.tasks.length > 0
-            ? result.tasks[0].action
-            : "Agent zakończył analizę klienta.";
-
-        showMessage(
-          `Agent zakończył pracę dla ${clientName}. Zadanie: ${latestTask}`,
-          "success"
-        );
-
+        const result = await apiFetch(`/api/clients/${client.id}/agent-run`, { method: "POST" });
+        const latestTask = result.tasks?.[0]?.action || "Agent zakończył analizę klienta.";
+        setMessage(message, `Agent zakończył pracę dla ${client.name}. Zadanie: ${latestTask}`, "success");
         await loadClients();
       } catch (error) {
-        showMessage(
-          getFriendlyError(error),
-          "error"
-        );
-
-        console.error(error);
+        setMessage(message, friendlyError(error), "error");
       } finally {
         button.disabled = false;
         button.textContent = originalText;
       }
     }
 
-    function updateStatistics(clients) {
-      const highPriority = clients.filter(
-        (client) => client.priority === "WYSOKI"
-      ).length;
-
-      const contactClients = clients.filter(
-        (client) => client.status === "KONTAKT"
-      ).length;
-
-      const tasksCount = clients.reduce(
-        (total, client) => {
-          const tasks = Array.isArray(client.agent_tasks)
-            ? client.agent_tasks
-            : [];
-
-          return total + tasks.length;
-        },
-        0
-      );
-
-      document.getElementById(
-        "totalClients"
-      ).textContent = clients.length;
-
-      document.getElementById(
-        "highPriorityClients"
-      ).textContent = highPriority;
-
-      document.getElementById(
-        "contactClients"
-      ).textContent = contactClients;
-
-      document.getElementById(
-        "agentTasksCount"
-      ).textContent = tasksCount;
-
-      clientsCounter.textContent =
-        clients.length === 1
-          ? "1 klient"
-          : `${clients.length} klientów`;
-    }
-
-    function createBadge(text, className) {
-      const badge = document.createElement("span");
-
-      badge.className = `badge ${className}`;
-      badge.textContent = text;
-
-      return badge;
-    }
-
     function createClientCard(client) {
-      const clientCard =
-        document.createElement("article");
-
-      clientCard.className = "client-card";
-
-      const header =
-        document.createElement("div");
-
+      const card = document.createElement("article");
+      card.className = "client";
+      const header = document.createElement("div");
       header.className = "client-header";
-
-      const identity =
-        document.createElement("div");
-
-      const name =
-        document.createElement("h3");
-
+      const identity = document.createElement("div");
+      const name = document.createElement("h3");
       name.className = "client-name";
       name.textContent = client.name;
-
-      const email =
-        document.createElement("a");
-
+      const email = document.createElement("a");
       email.className = "client-email";
       email.href = `mailto:${client.email}`;
       email.textContent = client.email;
-
-      identity.appendChild(name);
-      identity.appendChild(email);
-
-      const badges =
-        document.createElement("div");
-
+      identity.append(name, email);
+      const badges = document.createElement("div");
       badges.className = "badges";
+      badges.append(badge(client.status || "NOWY", "status-badge"), badge(`Priorytet: ${client.priority || "ŚREDNI"}`, priorityClass(client.priority)));
+      header.append(identity, badges);
 
-      badges.appendChild(
-        createBadge(
-          client.status || "NOWY",
-          "status-badge"
-        )
-      );
-
-      badges.appendChild(
-        createBadge(
-          `Priorytet: ${client.priority || "ŚREDNI"}`,
-          getPriorityClass(client.priority)
-        )
-      );
-
-      header.appendChild(identity);
-      header.appendChild(badges);
-
-      const noteBox =
-        document.createElement("div");
-
-      noteBox.className = "note-box";
-
-      const noteLabel =
-        document.createElement("span");
-
+      const note = document.createElement("div");
+      note.className = "note-box";
+      const noteLabel = document.createElement("span");
       noteLabel.className = "section-label";
       noteLabel.textContent = "Notatka";
+      const noteText = document.createElement("div");
+      noteText.textContent = client.note || "Brak notatki";
+      note.append(noteLabel, noteText);
 
-      const noteText =
-        document.createElement("div");
+      const toggle = document.createElement("button");
+      toggle.className = "details-toggle";
+      toggle.type = "button";
+      toggle.textContent = "Pokaż analizę AI i zadania ↓";
+      const details = document.createElement("div");
+      details.className = "client-details";
 
-      noteText.textContent =
-        client.note || "Brak notatki";
-
-      noteBox.appendChild(noteLabel);
-      noteBox.appendChild(noteText);
-
-      const aiBox =
-        document.createElement("div");
-
+      const aiBox = document.createElement("div");
       aiBox.className = "ai-box";
-
-      const aiTitle =
-        document.createElement("p");
-
+      const aiTitle = document.createElement("p");
       aiTitle.className = "ai-title";
       aiTitle.textContent = "✦ Analiza AI";
-
-      const summary =
-        document.createElement("p");
-
+      const summary = document.createElement("p");
       summary.className = "ai-content";
-      summary.textContent =
-        client.summary || "Brak analizy AI";
+      summary.textContent = client.summary || "Brak analizy AI";
+      const next = document.createElement("div");
+      next.className = "next-action";
+      const nextLabel = document.createElement("span");
+      nextLabel.className = "section-label";
+      nextLabel.textContent = "Następny krok";
+      const nextText = document.createElement("div");
+      nextText.textContent = client.next_action || "Brak rekomendowanego działania";
+      next.append(nextLabel, nextText);
+      aiBox.append(aiTitle, summary, next);
+      details.appendChild(aiBox);
 
-      const nextAction =
-        document.createElement("div");
-
-      nextAction.className = "next-action";
-
-      const nextActionLabel =
-        document.createElement("span");
-
-      nextActionLabel.className = "section-label";
-      nextActionLabel.textContent = "Następny krok";
-
-      const nextActionText =
-        document.createElement("div");
-
-      nextActionText.textContent =
-        client.next_action ||
-        "Brak rekomendowanego działania";
-
-      nextAction.appendChild(nextActionLabel);
-      nextAction.appendChild(nextActionText);
-
-      aiBox.appendChild(aiTitle);
-      aiBox.appendChild(summary);
-      aiBox.appendChild(nextAction);
-
-      clientCard.appendChild(header);
-      clientCard.appendChild(noteBox);
-      clientCard.appendChild(aiBox);
-
-      const tasks = Array.isArray(client.agent_tasks)
-        ? client.agent_tasks
-        : [];
-
+      const tasks = Array.isArray(client.agent_tasks) ? client.agent_tasks : [];
       if (tasks.length > 0) {
-        const latestTask = tasks[0];
-
-        const taskBox =
-          document.createElement("div");
-
-        taskBox.className = "agent-task";
-
-        const taskHeader =
-          document.createElement("div");
-
-        taskHeader.className = "task-header";
-
-        const taskTitle =
-          document.createElement("span");
-
+        const task = document.createElement("div");
+        task.className = "agent-task";
+        const taskHead = document.createElement("div");
+        taskHead.className = "task-head";
+        const taskTitle = document.createElement("span");
         taskTitle.className = "task-title";
-        taskTitle.textContent = "Zadanie agenta";
-
-        const taskStatus =
-          document.createElement("span");
-
+        taskTitle.textContent = "Najnowsze zadanie agenta";
+        const taskStatus = document.createElement("span");
         taskStatus.className = "task-status";
-        taskStatus.textContent =
-          latestTask.status || "OPEN";
-
-        const taskText =
-          document.createElement("p");
-
+        taskStatus.textContent = tasks[0].status || "OPEN";
+        const taskText = document.createElement("p");
         taskText.className = "task-text";
-        taskText.textContent = latestTask.action;
-
-        taskHeader.appendChild(taskTitle);
-        taskHeader.appendChild(taskStatus);
-
-        taskBox.appendChild(taskHeader);
-        taskBox.appendChild(taskText);
-
-        clientCard.appendChild(taskBox);
+        taskText.textContent = tasks[0].action;
+        taskHead.append(taskTitle, taskStatus);
+        task.append(taskHead, taskText);
+        details.appendChild(task);
       }
 
-      const actions =
-        document.createElement("div");
+      toggle.addEventListener("click", () => {
+        const isOpen = details.classList.toggle("open");
+        toggle.textContent = isOpen ? "Ukryj analizę AI i zadania ↑" : "Pokaż analizę AI i zadania ↓";
+      });
 
+      const actions = document.createElement("div");
       actions.className = "actions";
-
-      const agentButton =
-        document.createElement("button");
-
+      const agentButton = document.createElement("button");
       agentButton.type = "button";
-      agentButton.className =
-        "action-button agent-button";
-
+      agentButton.className = "action-button agent-button";
       agentButton.textContent = "✦ Uruchom agenta";
-
-      agentButton.addEventListener("click", () => {
-        runAgent(
-          client.id,
-          client.name,
-          agentButton
-        );
-      });
-
-      const editButton =
-        document.createElement("button");
-
+      agentButton.addEventListener("click", () => runAgent(client, agentButton));
+      const editButton = document.createElement("button");
       editButton.type = "button";
-      editButton.className =
-        "action-button edit-button";
-
+      editButton.className = "action-button edit-button";
       editButton.textContent = "Edytuj";
-
-      editButton.addEventListener("click", () => {
-        startEditing(client);
-      });
-
-      const deleteButton =
-        document.createElement("button");
-
+      editButton.addEventListener("click", () => startEditing(client));
+      const deleteButton = document.createElement("button");
       deleteButton.type = "button";
-      deleteButton.className =
-        "action-button delete-button";
-
+      deleteButton.className = "action-button delete-button";
       deleteButton.textContent = "Usuń";
+      deleteButton.addEventListener("click", () => deleteClient(client));
+      actions.append(agentButton, editButton, deleteButton);
+      card.append(header, note, toggle, details, actions);
+      return card;
+    }
 
-      deleteButton.addEventListener("click", () => {
-        deleteClient(client.id, client.name);
+    function updateStatistics(clients) {
+      document.getElementById("totalClients").textContent = clients.length;
+      document.getElementById("highPriorityClients").textContent = clients.filter((client) => client.priority === "WYSOKI").length;
+      document.getElementById("contactClients").textContent = clients.filter((client) => client.status === "KONTAKT").length;
+      document.getElementById("agentTasksCount").textContent = clients.reduce((sum, client) => sum + (Array.isArray(client.agent_tasks) ? client.agent_tasks.length : 0), 0);
+      document.getElementById("clientsCounter").textContent = clients.length === 1 ? "1 klient" : `${clients.length} klientów`;
+    }
+
+    function renderFilteredClients() {
+      const phrase = clientSearch.value.trim().toLowerCase();
+      const chosenStatus = statusFilter.value;
+      const chosenPriority = priorityFilter.value;
+      const filtered = allClients.filter((client) => {
+        const text = [client.name, client.email, client.note].filter(Boolean).join(" ").toLowerCase();
+        return text.includes(phrase) && (chosenStatus === "ALL" || client.status === chosenStatus) && (chosenPriority === "ALL" || client.priority === chosenPriority);
       });
-
-      actions.appendChild(agentButton);
-      actions.appendChild(editButton);
-      actions.appendChild(deleteButton);
-
-      clientCard.appendChild(actions);
-
-      return clientCard;
+      clientsList.innerHTML = "";
+      const filtersActive = phrase || chosenStatus !== "ALL" || chosenPriority !== "ALL";
+      filterResult.style.display = filtersActive ? "block" : "none";
+      filterResult.textContent = filtersActive ? `Znaleziono ${filtered.length} z ${allClients.length} klientów.` : "";
+      if (filtered.length === 0) {
+        clientsList.innerHTML = `<div class="empty-state"><div class="empty-icon">⌕</div><strong>Brak pasujących klientów</strong><p>Zmień wyszukiwaną frazę lub wybrane filtry.</p></div>`;
+        return;
+      }
+      filtered.forEach((client) => clientsList.appendChild(createClientCard(client)));
     }
 
     async function loadClients() {
-      clientsList.innerHTML = `
-        <div class="loading-state">
-          Pobieranie klientów...
-        </div>
-      `;
-
+      clientsList.innerHTML = `<div class="loading-state">Pobieranie klientów...</div>`;
       try {
-        const response = await fetch(
-          `${API_URL}/clients`
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            "Nie udało się pobrać klientów."
-          );
-        }
-
-        const clients = await response.json();
-
-        clientsList.innerHTML = "";
-        updateStatistics(clients);
-
-        if (clients.length === 0) {
-          clientsList.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-icon">+</div>
-              <strong>Brak klientów</strong>
-              <p>Dodaj pierwszego klienta za pomocą formularza.</p>
-            </div>
-          `;
-
+        allClients = await apiFetch("/clients");
+        updateStatistics(allClients);
+        if (allClients.length === 0) {
+          clientsList.innerHTML = `<div class="empty-state"><div class="empty-icon">+</div><strong>Brak klientów</strong><p>Dodaj pierwszego klienta za pomocą formularza.</p></div>`;
           return;
         }
-
-        clients.forEach((client) => {
-          clientsList.appendChild(
-            createClientCard(client)
-          );
-        });
+        renderFilteredClients();
       } catch (error) {
-        clientsList.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">!</div>
-            <strong>Nie udało się pobrać klientów</strong>
-            <p>Sprawdź, czy backend jest uruchomiony.</p>
-          </div>
-        `;
-
-        console.error(error);
+        if (currentUser) clientsList.innerHTML = `<div class="empty-state"><div class="empty-icon">!</div><strong>Nie udało się pobrać klientów</strong><p>${friendlyError(error)}</p></div>`;
       }
     }
 
-    clientForm.addEventListener("input", clearMessage);
-    clientForm.addEventListener("change", clearMessage);
-
+    clientSearch.addEventListener("input", renderFilteredClients);
+    statusFilter.addEventListener("change", renderFilteredClients);
+    priorityFilter.addEventListener("change", renderFilteredClients);
+    clientForm.addEventListener("input", () => setMessage(message, ""));
+    clientForm.addEventListener("change", () => setMessage(message, ""));
     cancelButton.addEventListener("click", () => {
-      resetForm();
-
-      showMessage(
-        "Edycja została anulowana.",
-        "info"
-      );
+      resetClientForm();
+      setMessage(message, "Edycja została anulowana.", "info");
     });
 
-    clientForm.addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
-        clearMessage();
-
-        const isEditing =
-          editingClientId !== null;
-
-        const clientData = {
-          name:
-            document.getElementById("name").value.trim(),
-
-          email:
-            document.getElementById("email").value.trim(),
-
-          note:
-            document.getElementById("note").value.trim(),
-
-          status:
-            document.getElementById("status").value,
-
-          priority:
-            document.getElementById("priority").value,
-        };
-
-        const requestUrl = isEditing
-          ? `${API_URL}/api/clients/${editingClientId}`
-          : `${API_URL}/api/clients`;
-
-        const requestMethod = isEditing
-          ? "PUT"
-          : "POST";
-
-        submitButton.disabled = true;
-
-        submitButton.textContent = isEditing
-          ? "Zapisywanie..."
-          : "AI analizuje klienta...";
-
-        try {
-          const response = await fetch(requestUrl, {
-            method: requestMethod,
-
-            headers: {
-              "Content-Type": "application/json",
-            },
-
-            body: JSON.stringify(clientData),
-          });
-
-          const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(
-              result.error ||
-              "Nie udało się zapisać klienta."
-            );
-          }
-
-          showMessage(
-            isEditing
-              ? "Zmiany klienta zostały zapisane."
-              : "Klient został zapisany i przeanalizowany przez AI.",
-            "success"
-          );
-
-          resetForm();
-          await loadClients();
-        } catch (error) {
-          showMessage(
-            getFriendlyError(error),
-            "error"
-          );
-
-          console.error(error);
-        } finally {
-          submitButton.disabled = false;
-
-          submitButton.textContent =
-            editingClientId === null
-              ? "Dodaj klienta"
-              : "Zapisz zmiany";
-        }
+    clientForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage(message, "");
+      const isEditing = editingClientId !== null;
+      const data = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        note: document.getElementById("note").value.trim(),
+        status: document.getElementById("status").value,
+        priority: document.getElementById("priority").value,
+      };
+      submitButton.disabled = true;
+      submitButton.textContent = isEditing ? "Zapisywanie..." : "AI analizuje klienta...";
+      try {
+        await apiFetch(isEditing ? `/api/clients/${editingClientId}` : "/api/clients", {
+          method: isEditing ? "PUT" : "POST",
+          body: JSON.stringify(data),
+        });
+        setMessage(message, isEditing ? "Zmiany klienta zostały zapisane." : "Klient został zapisany i przeanalizowany przez AI.", "success");
+        resetClientForm();
+        await loadClients();
+      } catch (error) {
+        setMessage(message, friendlyError(error), "error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = editingClientId === null ? "Dodaj klienta" : "Zapisz zmiany";
       }
-    );
+    });
 
-    loadClients();
+    setAuthMode("login");
+    checkSession();
   </script>
 </body>
 </html>
+  

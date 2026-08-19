@@ -51,7 +51,15 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:3000/api/clients",
+        "url": "http://localhost:3000/api/automation/clients",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -86,7 +94,13 @@
         0
       ],
       "id": "1b8b60d7-ef1d-4ccc-93eb-a3c9bfec0513",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "A6Z0jf2vPI6ZuGMN",
+          "name": "Header Auth account"
+        }
+      }
     },
     {
       "parameters": {
@@ -156,7 +170,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "290ea1ca-e0e5-4eb0-8c09-e0f134d4c3c5",
+  "versionId": "3b8acd73-7c35-45b7-873c-620ea74b876a",
   "meta": {
     "instanceId": "db4e94acd30027539f681851a75d70808eb23b99445d5e8ba169829dca760dce"
   },
